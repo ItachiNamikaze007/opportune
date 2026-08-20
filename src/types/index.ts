@@ -35,6 +35,7 @@ export interface EligibilityCriteria {
   allowedYears: number[]; // e.g. [1, 2, 3, 4]
   minCGPA?: number;
   maxAge?: number;
+  minAge?: number;
   requiredSkills?: string[];
   eligibleLocations?: string[];
   eligibleGender?: "all" | "female" | "male";

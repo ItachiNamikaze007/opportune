@@ -38,6 +38,7 @@ import { matchingService } from "@/services/matchingService";
 import { defaultStudentProfile } from "@/data/mockStudent";
 import { appConfig } from "@/lib/config";
 import { catalogAuditService, CatalogAuditReport } from "@/services/catalogAuditService";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
 
 export default function AdminReviewPage() {
@@ -659,7 +660,7 @@ export default function AdminReviewPage() {
 
         {/* TAB 4: CATALOG FRESHNESS AUDIT */}
         {activeTab === "freshness" && (() => {
-          const auditReport = catalogAuditService.generateAuditReport(mockOpportunities);
+          const auditReport = catalogAuditService.generateAuditReport(realVerifiedOpportunities);
           return (
             <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">

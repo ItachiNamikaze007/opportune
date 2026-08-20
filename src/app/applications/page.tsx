@@ -3,6 +3,7 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { useApplication } from "@/context/ApplicationContext";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
 import { ApplicationStage, StudentApplication } from "@/types";
 import { CategoryBadge } from "@/components/ui/CategoryBadge";
@@ -37,7 +38,10 @@ export default function ApplicationsTrackerPage() {
   ];
 
   const getOpportunity = (oppId: string) => {
-    return mockOpportunities.find((o) => o.id === oppId);
+    return (
+      realVerifiedOpportunities.find((o) => o.id === oppId) ||
+      mockOpportunities.find((o) => o.id === oppId)
+    );
   };
 
   const getNextStage = (current: ApplicationStage): ApplicationStage | null => {

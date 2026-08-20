@@ -3,6 +3,7 @@
 import React, { use, useState } from "react";
 import Link from "next/link";
 import { notFound, useRouter } from "next/navigation";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
 import { useStudent } from "@/context/StudentContext";
 import { useSaved } from "@/context/SavedContext";
@@ -47,7 +48,9 @@ export default function OpportunityDetailPage({
   const { addApplication, getApplicationByOppId } = useApplication();
   const { showToast } = useToast();
 
-  const opportunity = mockOpportunities.find((o) => o.id === resolvedParams.id);
+  const opportunity =
+    realVerifiedOpportunities.find((o) => o.id === resolvedParams.id) ||
+    mockOpportunities.find((o) => o.id === resolvedParams.id);
   if (!opportunity) {
     notFound();
   }
@@ -91,16 +94,6 @@ export default function OpportunityDetailPage({
           <span className="truncate max-w-[150px]">{opportunity.categoryLabel}</span>
         </div>
       </div>
-
-      {/* Demo / Expired Notices */}
-      {opportunity.isDemo && (
-        <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/20 text-xs text-amber-300 flex items-center gap-2">
-          <Info className="w-4 h-4 shrink-0 text-amber-400" />
-          <span>
-            <strong>Sample Demo Data:</strong> This opportunity contains illustrative sample criteria and dates for testing.
-          </span>
-        </div>
-      )}
 
       {statusResult.isExpired && (
         <div className="p-3.5 rounded-2xl bg-red-500/10 border border-red-500/20 text-xs text-red-300 flex items-center gap-2">

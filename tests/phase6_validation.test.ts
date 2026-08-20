@@ -378,3 +378,50 @@ test("Phase 6 Test 17: Public config strictly exposes public URL/Anon key and ne
   assert.ok(!("supabaseServiceRole" in appConfig));
   assert.ok(typeof appConfig.supabaseAnonKey === "string");
 });
+
+// 18. Zero Demo Opportunities Invariant in User-Facing Feed
+test("Phase 6 Test 18: User-facing opportunityService returns 0 demo opportunities", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+  const opps = await opportunityService.getOpportunities();
+
+  assert.ok(opps.length > 0, "Should have real verified opportunities loaded");
+  const demoOpps = opps.filter((o) => o.isDemo === true);
+  assert.equal(demoOpps.length, 0, "Zero demo opportunities must be present in user-facing data");
+});
+
+// 19. All User-Facing Opportunities Are Verified and Published from Official Sources
+test("Phase 6 Test 19: All user-facing opportunities have verificationStatus=verified and lifecycleStatus=published", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+  const opps = await opportunityService.getOpportunities();
+
+  for (const opp of opps) {
+    assert.equal(opp.isDemo, false, `Opportunity [${opp.id}] must not be demo`);
+    assert.equal(opp.verificationStatus, "verified", `Opportunity [${opp.id}] must be verified`);
+    assert.equal(opp.lifecycleStatus, "published", `Opportunity [${opp.id}] must be published`);
+    assert.ok(opp.officialUrl.startsWith("http"), `Opportunity [${opp.id}] must have valid official URL`);
+  }
+});
+
+// 20. Expired Opportunities Suppression from Active Feeds
+test("Phase 6 Test 20: Expired opportunities are never included in active Top Matches or Closing Soon", async () => {
+  const { realVerifiedOpportunities } = await import("../src/data/realOpportunities");
+  const { matchingService } = await import("../src/services/matchingService");
+
+  const rawMatches = realVerifiedOpportunities.map((opp) => ({
+    opportunity: opp,
+    match: matchingService.evaluateMatch("test-student-id", testStudent, opp),
+  }));
+
+  const ranked = matchingService.rankMatchesForStudent(testStudent, rawMatches);
+  const activeTopMatches = ranked.filter(
+    (r) => !r.isExpired && r.match.score >= 80 && r.match.status === "eligible"
+  );
+  const activeClosingSoon = ranked.filter(
+    (r) => !r.isExpired && r.isUrgent && r.match.status !== "not_eligible"
+  );
+
+  // Assert expired opportunity is excluded from active feeds
+  assert.ok(!activeTopMatches.some((r) => r.opportunity.id === "real-isro-resp-2025-expired"));
+  assert.ok(!activeClosingSoon.some((r) => r.opportunity.id === "real-isro-resp-2025-expired"));
+});
+

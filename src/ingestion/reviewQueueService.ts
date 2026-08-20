@@ -1,12 +1,19 @@
 import type { Opportunity } from "@/types";
 import type { ReviewQueueItem, NormalizedOpportunity } from "./types";
 import { ingestionLogger } from "./ingestionLogger";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 
 class ReviewQueueService {
   private queue: Map<string, ReviewQueueItem> = new Map();
   private publishedRealOpportunities: Map<string, Opportunity> = new Map();
 
   constructor() {
+    // Populate published real verified opportunities
+    realVerifiedOpportunities.forEach((opp) => {
+      if (opp.lifecycleStatus === "published" && opp.verificationStatus === "verified") {
+        this.publishedRealOpportunities.set(opp.id, opp);
+      }
+    });
     this.seedInitialReviewItems();
   }
 

@@ -1,5 +1,5 @@
 import { Opportunity, EligibilityCriteria } from "@/types";
-import { mockOpportunities } from "@/data/mockOpportunities";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { getSupabaseClient } from "@/lib/supabase/client";
 import { DbOpportunity, DbOpportunityEligibilityRule, DbOpportunitySource } from "@/types/database";
 import { reviewQueueService } from "@/ingestion/reviewQueueService";
@@ -54,8 +54,8 @@ function mapDbToOpportunity(
 
 export const opportunityService = {
   /**
-   * Fetches all opportunities from Supabase with rules, or returns appropriate mode dataset.
-   * STRICT ISOLATION RULE: In Production Mode, NEVER return demo opportunities.
+   * Fetches all real opportunities from Supabase with rules, or returns verified published catalog.
+   * STRICT ISOLATION RULE: User-facing feeds only receive is_demo = false, verified, published opportunities.
    */
   async getOpportunities(): Promise<Opportunity[]> {
     if (appConfig.isProduction) {
@@ -78,14 +78,13 @@ export const opportunityService = {
               )
             );
             const publishedReal = reviewQueueService.getPublishedRealOpportunities();
-            // Merge deduplicated real published opportunities
             const combined = [...dbList];
             for (const pub of publishedReal) {
               if (!combined.some((c) => c.id === pub.id)) {
                 combined.push(pub);
               }
             }
-            return combined;
+            return combined.filter((o) => !o.isDemo && o.verificationStatus === "verified");
           }
         } catch (err) {
           console.error("Production Supabase opportunities query failed:", err);
@@ -94,16 +93,17 @@ export const opportunityService = {
       }
 
       // In production mode, only return verified published real opportunities from ingestion pipeline
-      return reviewQueueService.getPublishedRealOpportunities();
+      return reviewQueueService.getPublishedRealOpportunities().filter((o) => !o.isDemo);
     }
 
-    // Demo mode: Supabase fallback or combine verified demo opportunities with approved real ones
+    // Default application mode: Supabase or verified published real opportunities
     const supabase = getSupabaseClient();
     if (supabase) {
       try {
         const { data: opps, error } = await supabase
           .from("opportunities")
           .select("*, opportunity_eligibility_rules(*)")
+          .eq("lifecycle_status", "published")
           .order("deadline", { ascending: true });
 
         if (opps && opps.length > 0 && !error) {
@@ -112,15 +112,21 @@ export const opportunityService = {
               o,
               o.opportunity_eligibility_rules?.[0] || o.opportunity_eligibility_rules
             )
-          );
+          ).filter((o) => !o.isDemo && o.verificationStatus === "verified");
         }
       } catch (err) {
-        console.warn("Supabase demo fallback:", err);
+        console.warn("Supabase real fetch fallback:", err);
       }
     }
 
     const publishedReal = reviewQueueService.getPublishedRealOpportunities();
-    return [...publishedReal, ...mockOpportunities];
+    if (publishedReal.length > 0) {
+      return publishedReal.filter((o) => !o.isDemo && o.verificationStatus === "verified");
+    }
+
+    return realVerifiedOpportunities.filter(
+      (o) => !o.isDemo && o.verificationStatus === "verified" && o.lifecycleStatus === "published"
+    );
   },
 
   /**
@@ -149,12 +155,13 @@ export const opportunityService = {
     }
 
     const publishedReal = reviewQueueService.getPublishedRealOpportunities();
-    if (appConfig.isProduction) {
-      return publishedReal.find((o) => o.id === id) || null;
-    }
+    const fromQueue = publishedReal.find((o) => o.id === id);
+    if (fromQueue) return fromQueue;
 
-    const all = [...publishedReal, ...mockOpportunities];
-    return all.find((o) => o.id === id) || null;
+    const fromReal = realVerifiedOpportunities.find((o) => o.id === id);
+    if (fromReal) return fromReal;
+
+    return null;
   },
 
   /**

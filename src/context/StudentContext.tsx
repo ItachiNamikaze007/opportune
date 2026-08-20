@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useEffect, useState, useMemo, ReactNode } from "react";
 import { Opportunity, StudentProfile, EligibilityResult } from "@/types";
 import { defaultStudentProfile } from "@/data/mockStudent";
-import { mockOpportunities } from "@/data/mockOpportunities";
+import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { calculateEligibility } from "@/services/eligibilityEngine";
 import { studentService } from "@/services/studentService";
 import { opportunityService } from "@/services/opportunityService";
@@ -40,7 +40,11 @@ const StudentContext = createContext<StudentContextType | undefined>(undefined);
 
 export const StudentProvider = ({ children }: { children: ReactNode }) => {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(defaultStudentProfile);
-  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>(mockOpportunities);
+  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>(
+    realVerifiedOpportunities.filter(
+      (o) => !o.isDemo && o.verificationStatus === "verified" && o.lifecycleStatus === "published"
+    )
+  );
   const [isLoaded, setIsLoaded] = useState(false);
 
   // Load from studentService (Database or localStorage fallback)
@@ -149,7 +153,10 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
 
   // Multi-Factor Personalized Matches Ranking (Phase 4)
   const rankedMatches: RankedOpportunityMatch[] = useMemo(() => {
-    const rawMatches = allOpportunities.map((opp) => ({
+    const validOpportunities = allOpportunities.filter(
+      (opp) => !opp.isDemo && opp.verificationStatus === "verified"
+    );
+    const rawMatches = validOpportunities.map((opp) => ({
       opportunity: opp,
       match: matchingService.evaluateMatch("demo-student-id", studentProfile, opp),
     }));

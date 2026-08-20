@@ -38,8 +38,6 @@ export default function ExplorePage() {
 
   // Filter and sort items
   const filteredOpportunities = useMemo(() => {
-    const today = new Date("2026-08-20");
-
     let results = opportunitiesWithEligibility.filter(({ opportunity, eligibility }) => {
       // 1. Text Search
       if (searchQuery.trim()) {

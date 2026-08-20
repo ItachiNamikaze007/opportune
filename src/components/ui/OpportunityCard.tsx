@@ -120,14 +120,6 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
                     <ShieldCheck className="w-3.5 h-3.5 fill-blue-500/20" />
                   </span>
                 )}
-                {opportunity.isDemo && (
-                  <span
-                    className="inline-flex items-center text-[10px] font-semibold text-slate-400 px-1.5 py-0.2 rounded bg-slate-800/80 border border-slate-700/50"
-                    title="Illustrative sample opportunity for testing."
-                  >
-                    Sample Demo
-                  </span>
-                )}
               </div>
               <Link
                 href={`/opportunities/${opportunity.id}`}

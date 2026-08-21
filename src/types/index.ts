@@ -17,6 +17,8 @@ export type Degree =
   | "MCA"
   | "B.Sc"
   | "M.Sc"
+  | "B.A."
+  | "M.A."
   | "M.Tech"
   | "M.E."
   | "PhD"
@@ -60,13 +62,15 @@ export interface EligibilityResult {
 }
 
 export type VerificationStatus =
-  | "demo"
   | "verified"
+  | "partner_verified"
+  | "verified_partner"
+  | "verified_gov"
   | "pending"
+  | "failed"
+  | "demo"
   | "needs_review"
   | "expired"
-  | "verified_gov"
-  | "verified_partner"
   | "community_verified";
 
 export type StipendType =
@@ -77,6 +81,7 @@ export type StipendType =
   | "free_waiver";
 
 export type LifecycleStatus =
+  | "draft"
   | "discovered"
   | "processing"
   | "pending_review"
@@ -90,6 +95,8 @@ export type ReviewStatus =
   | "approved"
   | "rejected"
   | "needs_more_information";
+
+export type SourceProvenanceType = "official" | "partner" | "aggregator";
 
 export type ConfidenceLevel =
   | "needs_review"
@@ -109,6 +116,8 @@ export interface ConfidenceBreakdown {
 export interface Opportunity {
   id: string;
   sourceId?: string;
+  sourceName?: string;
+  sourceType?: SourceProvenanceType;
   title: string;
   organization: string;
   orgLogo?: string; // initial or badge icon
@@ -124,6 +133,11 @@ export interface Opportunity {
   officialUrl: string;
   applyUrl?: string;
   sourceUrl?: string;
+  officialSourceUrl?: string;
+  rulesPdfUrl?: string;
+  rulesUrl?: string;
+  sourceConflict?: boolean;
+  sourceMetadata?: Record<string, any>;
   verificationStatus: VerificationStatus;
   lifecycleStatus?: LifecycleStatus;
   confidenceScore?: number;

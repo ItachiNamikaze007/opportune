@@ -34,6 +34,8 @@ import {
   Send,
   Info,
   AlertTriangle,
+  FileText,
+  Globe,
 } from "lucide-react";
 
 export default function OpportunityDetailPage({
@@ -64,10 +66,11 @@ export default function OpportunityDetailPage({
   const handleApplyClick = () => {
     // Add to application tracker automatically
     addApplication(opportunity.id, "applied", `Applied on ${new Date().toLocaleDateString()}`);
-    // Open official portal in new tab
-    window.open(opportunity.officialUrl, "_blank", "noopener,noreferrer");
+    // Open official registration / application portal in new tab
+    const targetUrl = opportunity.applyUrl || opportunity.officialUrl;
+    window.open(targetUrl, "_blank", "noopener,noreferrer");
     showToast(
-      "Opening Official Website",
+      "Opening Registration Portal",
       "Added to your Application Tracker as 'Applied'.",
       "success"
     );
@@ -120,11 +123,15 @@ export default function OpportunityDetailPage({
                   <span>{opportunity.location}</span>
                 </span>
               )}
-              {(opportunity.verificationStatus === "verified_gov" ||
-                opportunity.verificationStatus === "verified") && (
+              {opportunity.sourceType === "partner" || opportunity.verificationStatus === "partner_verified" ? (
+                <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span>Partner Verified ({opportunity.sourceName || "Unstop"})</span>
+                </span>
+              ) : (
                 <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-lg text-xs font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
                   <ShieldCheck className="w-3.5 h-3.5" />
-                  <span>Verified Source</span>
+                  <span>Official Source</span>
                 </span>
               )}
             </div>
@@ -133,8 +140,12 @@ export default function OpportunityDetailPage({
               {opportunity.title}
             </h1>
 
-            <div className="flex items-center gap-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
+            <div className="flex flex-wrap items-center gap-2 text-sm text-slate-600 dark:text-slate-300 font-medium">
               <span>{opportunity.organization}</span>
+              <span>•</span>
+              <span className="text-xs text-slate-400">
+                Source: <strong className="text-slate-200">{opportunity.sourceName || opportunity.organization}</strong>
+              </span>
               <span>•</span>
               <span className="text-xs text-slate-400 font-mono">
                 Verified: {opportunity.lastVerified}
@@ -197,32 +208,61 @@ export default function OpportunityDetailPage({
           </div>
         </div>
 
-        {/* Primary Call to Action Strip */}
-        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-2">
+        {/* Action Buttons Strip */}
+        <div className="flex flex-wrap items-center justify-between gap-3 pt-2">
           <div className="flex items-center gap-2 text-xs text-slate-500 dark:text-slate-400">
             <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
             <span>
               {statusResult.isExpired
-                ? "This opportunity is closed. You can view historical details."
-                : `Redirects directly to authentic application page on ${opportunity.organization}`}
+                ? "This opportunity has concluded."
+                : `Verified from ${opportunity.sourceName || opportunity.organization}`}
             </span>
           </div>
 
-          <div className="flex items-center gap-3 w-full sm:w-auto">
+          <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
+            {/* Rules / Guidelines PDF Button (Only if URL exists) */}
+            {(opportunity.rulesPdfUrl || opportunity.rulesUrl) && (
+              <a
+                href={opportunity.rulesPdfUrl || opportunity.rulesUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition-colors"
+              >
+                <FileText className="w-3.5 h-3.5 text-brand-400" />
+                <span>Rules / PDF</span>
+                <ExternalLink className="w-3 h-3 opacity-60" />
+              </a>
+            )}
+
+            {/* Official Website Button (Only if URL exists) */}
+            {opportunity.officialUrl && (
+              <a
+                href={opportunity.officialUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition-colors"
+              >
+                <Globe className="w-3.5 h-3.5 text-blue-400" />
+                <span>Official Website</span>
+                <ExternalLink className="w-3 h-3 opacity-60" />
+              </a>
+            )}
+
+            {/* Apply / Register Button */}
             {statusResult.isExpired ? (
               <button
                 disabled
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs sm:text-sm border border-slate-700 cursor-not-allowed flex items-center justify-center gap-2"
+                className="px-6 py-3 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs border border-slate-700 cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span>Applications Closed</span>
               </button>
             ) : (
               <button
                 onClick={handleApplyClick}
-                className="w-full sm:w-auto px-8 py-3.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs sm:text-sm transition-all shadow-xl shadow-brand-600/30 flex items-center justify-center gap-2"
+                className="px-6 py-3 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-xl shadow-brand-600/30 flex items-center justify-center gap-1.5"
               >
-                <span>Apply on Official Website</span>
-                <ExternalLink className="w-4 h-4" />
+                <span>Apply / Register Now</span>
+                <ExternalLink className="w-3.5 h-3.5" />
               </button>
             )}
           </div>

@@ -24,6 +24,7 @@ export type SourceStatus =
   | "manual_review_required";
 
 export type LifecycleStatus =
+  | "draft"
   | "discovered"
   | "processing"
   | "pending_review"
@@ -144,6 +145,8 @@ export interface DbRawOpportunityRecord {
 export interface DbOpportunity {
   id: string;
   source_id: string | null;
+  source_name?: string | null;
+  source_type?: "official" | "partner" | "aggregator" | null;
   title: string;
   organization: string;
   category: OpportunityCategory;
@@ -158,6 +161,10 @@ export interface DbOpportunity {
   official_url: string;
   apply_url: string | null;
   source_url: string | null;
+  official_source_url?: string | null;
+  rules_pdf_url?: string | null;
+  source_conflict?: boolean;
+  source_metadata?: Record<string, any> | null;
   verification_status: VerificationStatus;
   lifecycle_status: LifecycleStatus;
   confidence_score: number;

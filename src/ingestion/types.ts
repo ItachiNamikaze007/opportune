@@ -14,9 +14,12 @@ import type { SourceStatus, SourceType } from "@/types/database";
 export interface RawOpportunityRecord {
   rawId?: string;
   sourceId: string;
+  sourceName?: string;
+  sourceType?: "official" | "partner" | "aggregator";
   sourceUrl: string;
   officialUrl?: string;
   applyUrl?: string;
+  rulesPdfUrl?: string;
   title: string;
   organization: string;
   categoryRaw?: string;
@@ -48,6 +51,8 @@ export interface ExtractedEligibility {
 export interface NormalizedOpportunity {
   id?: string;
   sourceId: string;
+  sourceName?: string;
+  sourceType?: "official" | "partner" | "aggregator";
   title: string;
   organization: string;
   category: OpportunityCategory;
@@ -62,6 +67,7 @@ export interface NormalizedOpportunity {
   officialUrl: string;
   applyUrl: string;
   sourceUrl: string;
+  rulesPdfUrl?: string;
   verificationStatus: VerificationStatus;
   lifecycleStatus: LifecycleStatus;
   confidenceScore: number;

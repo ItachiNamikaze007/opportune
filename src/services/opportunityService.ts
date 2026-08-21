@@ -6,6 +6,7 @@ import { reviewQueueService } from "@/ingestion/reviewQueueService";
 import { appConfig, assertProductionConfig } from "@/lib/config";
 import { getOpportunityStatus } from "@/services/opportunityStatusResolver";
 import { matchingService, RankedOpportunityMatch } from "@/services/matchingService";
+import { opportunityVerificationService } from "@/services/opportunityVerificationService";
 
 function mapDbToOpportunity(
   dbOpp: DbOpportunity,
@@ -32,6 +33,9 @@ function mapDbToOpportunity(
 
   return {
     id: dbOpp.id,
+    sourceId: dbOpp.source_id || undefined,
+    sourceName: dbOpp.source_name || "Official Source",
+    sourceType: (dbOpp.source_type as any) || "official",
     title: dbOpp.title,
     organization: dbOpp.organization,
     category: dbOpp.category,
@@ -46,6 +50,10 @@ function mapDbToOpportunity(
     officialUrl: dbOpp.official_url,
     applyUrl: dbOpp.apply_url || undefined,
     sourceUrl: dbOpp.source_url || undefined,
+    officialSourceUrl: dbOpp.official_source_url || undefined,
+    rulesPdfUrl: dbOpp.rules_pdf_url || undefined,
+    sourceConflict: dbOpp.source_conflict || false,
+    sourceMetadata: dbOpp.source_metadata || undefined,
     verificationStatus: dbOpp.verification_status,
     lifecycleStatus: dbOpp.lifecycle_status,
     lastVerified: dbOpp.last_verified_at ? dbOpp.last_verified_at.split("T")[0] : new Date().toISOString().split("T")[0],
@@ -74,11 +82,11 @@ export interface StudentMatchedOpportunitiesResult {
 export const opportunityService = {
   /**
    * Fetches only active, verified, published opportunities.
-   * STRICT GUARANTEES:
-   * 1. Primary data source in production is Supabase.
-   * 2. Excludes all expired opportunities (deadline < now or lifecycle_status = expired).
-   * 3. Excludes demo items, unpublished, pending, or rejected records.
-   * 4. Validates required fields before returning.
+   * STRICT PRODUCTION DATA PIPELINE GUARANTEES:
+   * 1. Supabase is the SINGLE SOURCE OF TRUTH in production. Zero mock/static fallback.
+   * 2. Database query filters: verification_status IN ('verified', 'partner_verified'), lifecycle_status='published', is_demo=false, deadline >= today.
+   * 3. Service layer verifies official/partner allowlists, explicit non-inferred deadlines, and rules PDF validation via opportunityVerificationService.
+   * 4. Timezone-normalized expiry checks ensure past-deadline items are completely excluded.
    */
   async getActiveOpportunities(options?: { referenceDate?: Date }): Promise<Opportunity[]> {
     const refDate = options?.referenceDate instanceof Date ? options.referenceDate : new Date();
@@ -90,13 +98,14 @@ export const opportunityService = {
       const supabase = getSupabaseClient();
 
       if (!supabase) {
-        throw new Error("[Production Error] Supabase client is not available in production mode.");
+        throw new Error("[Production Error] Supabase client is not configured in production mode.");
       }
 
       try {
         const { data: opps, error } = await supabase
           .from("opportunities")
           .select("*, opportunity_eligibility_rules(*)")
+          .in("verification_status", ["verified", "partner_verified", "verified_gov", "verified_partner"])
           .eq("lifecycle_status", "published")
           .eq("is_demo", false)
           .gte("deadline", todayIso)
@@ -116,12 +125,12 @@ export const opportunityService = {
               )
             )
             .filter((opp) => {
-              // Defensive client/service check: Must be verified, published, non-demo, and strictly not expired
+              // Defensive verification check
+              const verifyRes = opportunityVerificationService.verifyOpportunity(opp, refDate);
               const statusRes = getOpportunityStatus(opp, refDate);
               return (
-                !opp.isDemo &&
-                (opp.verificationStatus === "verified" || opp.verificationStatus === "verified_gov") &&
-                opp.lifecycleStatus === "published" &&
+                verifyRes.verified &&
+                !verifyRes.isExpired &&
                 !statusRes.isExpired &&
                 statusRes.status !== "EXPIRED" &&
                 statusRes.status !== "UNKNOWN"
@@ -142,6 +151,7 @@ export const opportunityService = {
         const { data: opps, error } = await supabase
           .from("opportunities")
           .select("*, opportunity_eligibility_rules(*)")
+          .in("verification_status", ["verified", "partner_verified", "verified_gov", "verified_partner"])
           .eq("lifecycle_status", "published")
           .eq("is_demo", false)
           .gte("deadline", todayIso)
@@ -156,14 +166,9 @@ export const opportunityService = {
               )
             )
             .filter((opp) => {
+              const verifyRes = opportunityVerificationService.verifyOpportunity(opp, refDate);
               const statusRes = getOpportunityStatus(opp, refDate);
-              return (
-                !opp.isDemo &&
-                (opp.verificationStatus === "verified" || opp.verificationStatus === "verified_gov") &&
-                opp.lifecycleStatus === "published" &&
-                !statusRes.isExpired &&
-                statusRes.status !== "EXPIRED"
-              );
+              return verifyRes.verified && !verifyRes.isExpired && !statusRes.isExpired;
             });
         }
       } catch (err) {
@@ -171,18 +176,20 @@ export const opportunityService = {
       }
     }
 
-    // Dev fallback: Check review queue published opportunities
+    // Dev fallback: Filter candidate list strictly through verification service
     const publishedReal = reviewQueueService.getPublishedRealOpportunities();
     const candidateList = publishedReal.length > 0 ? publishedReal : realVerifiedOpportunities;
 
     return candidateList.filter((opp) => {
+      const verifyRes = opportunityVerificationService.verifyOpportunity(opp, refDate);
       const statusRes = getOpportunityStatus(opp, refDate);
       return (
         !opp.isDemo &&
-        (opp.verificationStatus === "verified" || opp.verificationStatus === "verified_gov") &&
+        opp.verificationStatus === "verified" &&
         opp.lifecycleStatus === "published" &&
-        !statusRes.isExpired &&
-        statusRes.status !== "EXPIRED"
+        verifyRes.verified &&
+        !verifyRes.isExpired &&
+        !statusRes.isExpired
       );
     });
   },
@@ -196,8 +203,6 @@ export const opportunityService = {
 
   /**
    * Evaluates and ranks live active opportunities dynamically for a given student profile.
-   * All metrics (total evaluated, eligible count, top matches) are calculated dynamically
-   * based on the student's actual credentials.
    */
   async getEligibleOpportunitiesForStudent(
     studentProfile: StudentProfile,
@@ -214,7 +219,7 @@ export const opportunityService = {
     // Multi-factor ranking
     const rankedMatches = matchingService.rankMatchesForStudent(studentProfile, rawMatches);
 
-    // Filter dynamic streams (Strictly excluding any expired or ineligible where appropriate)
+    // Filter dynamic streams
     const topMatches = rankedMatches.filter(
       (r) => !r.isExpired && r.match.score >= 80 && r.match.status === "eligible"
     );
@@ -299,4 +304,5 @@ export const opportunityService = {
     return [];
   },
 };
+
 

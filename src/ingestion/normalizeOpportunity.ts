@@ -207,6 +207,8 @@ export function normalizeOpportunity(
 
   const partialOpp: NormalizedOpportunity = {
     sourceId,
+    sourceName: raw.sourceName || organization,
+    sourceType: raw.sourceType || (isOfficialSource ? "official" : "partner"),
     title,
     organization,
     category,
@@ -220,6 +222,7 @@ export function normalizeOpportunity(
     stipendType,
     officialUrl,
     applyUrl,
+    rulesPdfUrl: raw.rulesPdfUrl,
     sourceUrl,
     verificationStatus,
     lifecycleStatus,

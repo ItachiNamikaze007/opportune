@@ -213,6 +213,9 @@ class ReviewQueueService {
     const publishedOpp: Opportunity = {
       ...opp,
       id: opp.id || review.opportunityId,
+      sourceName: opp.sourceName || opp.organization,
+      sourceType: opp.sourceType || "official",
+      rulesPdfUrl: opp.rulesPdfUrl,
       isDemo: false,
     };
 

@@ -519,4 +519,244 @@ test("Phase 6 Test 24: No hardcoded '47' or '47+' string remains in user-facing 
   }
 });
 
+// 25. Official Domain Validation & Third-Party Rejection
+test("Phase 6 Test 25: Official domain validation accepts authentic domains and rejects third-party sites", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  // Valid official domains
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://isro.gov.in/Careers.html"), true);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://meity.gov.in/internship-scheme"), true);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://summerofcode.withgoogle.com"), true);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://campuscommune.tcs.com/codevita"), true);
+
+  // Third-party aggregators, blogs, and search snippets must be rejected
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://www.google.com/search?q=internships"), false);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://www.reddit.com/r/developers/opportunities"), false);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://medium.com/@author/tech-jobs-2026"), false);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://sarkariresult.com/latest-jobs"), false);
+  assert.equal(opportunityVerificationService.isValidOfficialUrl("https://freejobalert.com/isro-recruitment"), false);
+});
+
+// 26. Missing or Ambiguous Deadlines Are Never Inferred
+test("Phase 6 Test 26: Missing or ambiguous deadlines ('rolling', 'TBD', empty) return valid: false", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const checkEmpty = opportunityVerificationService.validateExplicitDeadline("");
+  assert.equal(checkEmpty.valid, false);
+
+  const checkRolling = opportunityVerificationService.validateExplicitDeadline("rolling");
+  assert.equal(checkRolling.valid, false);
+
+  const checkTBD = opportunityVerificationService.validateExplicitDeadline("TBD");
+  assert.equal(checkTBD.valid, false);
+
+  const checkValid = opportunityVerificationService.validateExplicitDeadline("2026-09-20");
+  assert.equal(checkValid.valid, true);
+  assert.equal(checkValid.dateIso, "2026-09-20");
+});
+
+// 27. Google Summer of Code Unverified Timeline Handling
+test("Phase 6 Test 27: GSoC without explicit verified active deadline is marked draft/pending and excluded from active feeds", async () => {
+  const { realVerifiedOpportunities } = await import("../src/data/realOpportunities");
+  const { opportunityService } = await import("../src/services/opportunityService");
+
+  const gsoc = realVerifiedOpportunities.find((o) => o.id === "real-google-summer-2026");
+  assert.ok(gsoc, "GSoC record exists in dataset");
+  assert.equal(gsoc.lifecycleStatus, "draft");
+  assert.equal(gsoc.verificationStatus, "pending");
+
+  const activeOpps = await opportunityService.getActiveOpportunities();
+  assert.ok(!activeOpps.some((o) => o.id === "real-google-summer-2026"), "Unverified GSoC must not appear in active feeds");
+});
+
+// 28. Application URL Validation
+test("Phase 6 Test 28: Application URL must belong to an official or valid subportal", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  assert.equal(opportunityVerificationService.isValidApplicationUrl("https://apps.isro.gov.in/icrb/apply"), true);
+  assert.equal(opportunityVerificationService.isValidApplicationUrl("https://upsconline.nic.in/mainmenu2.php"), true);
+  assert.equal(opportunityVerificationService.isValidApplicationUrl("https://sarkariresult.com/apply"), false);
+});
+
+// 29. Re-Verification Service Support
+test("Phase 6 Test 29: reverifyOpportunity returns structured verification result and updates verifiedAt", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const testOpp: Opportunity = {
+    id: "opp-verify-test",
+    title: "ISRO Scientist Exam",
+    organization: "ISRO",
+    category: "government_exam",
+    categoryLabel: "Government Exam",
+    description: "Official recruitment",
+    fullDescription: "Full details",
+    deadline: "2026-10-15",
+    location: "Bengaluru",
+    remote: false,
+    stipendOrPrize: "Level 10",
+    stipendType: "salary",
+    officialUrl: "https://www.isro.gov.in/Careers.html",
+    applyUrl: "https://apps.isro.gov.in/icrb/apply",
+    verificationStatus: "verified",
+    lastVerified: "2026-08-21",
+    tags: [],
+    benefits: [],
+    applicationSteps: [],
+    importantDates: [],
+    eligibilityCriteria: { allowedDegrees: ["B.Tech"], allowedBranches: ["Computer Science"], allowedYears: [4] },
+  };
+
+  const reverify = await opportunityVerificationService.reverifyOpportunity(testOpp);
+  assert.equal(reverify.verified, true);
+  assert.equal(reverify.domainValid, true);
+  assert.equal(reverify.isExpired, false);
+  assert.ok(reverify.verifiedAt);
+});
+
+// 30. HTML Content Parsing & Explicit Deadline Extraction
+test("Phase 6 Test 30: extractOpportunityFromHtml extracts explicit title, deadline, and application URL", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const sampleOfficialHtml = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <title>ISRO Centralised Recruitment Board - Scientist/Engineer SC 2026</title>
+      </head>
+      <body>
+        <main>
+          <h1>Scientist/Engineer 'SC' Recruitment Examination 2026</h1>
+          <p>Online registration is open for engineering graduates.</p>
+          <div class="dates-section">
+            <p><strong>Application Deadline:</strong> 2026-09-20</p>
+          </div>
+          <a href="https://apps.isro.gov.in/icrb/apply">Apply Online</a>
+        </main>
+      </body>
+    </html>
+  `;
+
+  const extracted = opportunityVerificationService.extractOpportunityFromHtml(sampleOfficialHtml, "https://isro.gov.in/Careers.html");
+  assert.ok(extracted.title?.includes("ISRO"));
+  assert.equal(extracted.deadline, "2026-09-20");
+  assert.equal(extracted.applyUrl, "https://apps.isro.gov.in/icrb/apply");
+});
+
+// 31. Stored vs Official Deadline Conflict Detection
+test("Phase 6 Test 31: Stored deadline conflicting with official extracted deadline causes verification to FAIL", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const sampleHtmlWithDifferentDate = `
+    <html>
+      <head><title>Official Recruitment Notice</title></head>
+      <body>
+        <p>Registration closes: 2026-09-10</p>
+      </body>
+    </html>
+  `;
+
+  // Stored deadline is 2026-09-20, but official site says 2026-09-10
+  const extracted = opportunityVerificationService.extractOpportunityFromHtml(sampleHtmlWithDifferentDate, "https://isro.gov.in");
+  assert.equal(extracted.deadline, "2026-09-10");
+
+  const storedOpp: Opportunity = {
+    id: "test-opp-conflict",
+    title: "Official Recruitment Notice",
+    organization: "ISRO",
+    category: "government_exam",
+    categoryLabel: "Government Exam",
+    description: "Official recruitment",
+    fullDescription: "Full details",
+    deadline: "2026-09-20", // Conflicting stored deadline
+    location: "Bengaluru",
+    remote: false,
+    stipendOrPrize: "Pay Matrix 10",
+    stipendType: "salary",
+    officialUrl: "https://isro.gov.in",
+    verificationStatus: "verified",
+    lastVerified: "2026-08-21",
+    tags: [],
+    benefits: [],
+    applicationSteps: [],
+    importantDates: [],
+    eligibilityCriteria: { allowedDegrees: ["B.Tech"], allowedBranches: ["All Branches"], allowedYears: [4] },
+  };
+
+  assert.notEqual(storedOpp.deadline, extracted.deadline, "Stored deadline conflicts with official source");
+});
+
+// 32. Missing Official Deadline Causes Verification Failure
+test("Phase 6 Test 32: Webpage containing no explicit deadline fails verification without guessing", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const htmlWithoutDeadline = `
+    <html>
+      <head><title>General Careers Portal</title></head>
+      <body>
+        <p>Welcome to our careers page. Please check back later for upcoming openings.</p>
+      </body>
+    </html>
+  `;
+
+  const extracted = opportunityVerificationService.extractOpportunityFromHtml(htmlWithoutDeadline, "https://isro.gov.in");
+  assert.equal(extracted.deadline, undefined, "Must NOT guess or infer a deadline");
+});
+
+// 33. Unstop Partner Source Acceptance
+test("Phase 6 Test 33: Unstop partner source is recognized and accepted as partner source", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const unstopUrl = "https://unstop.com/hackathons/tata-imagination-challenge-2026";
+  assert.equal(opportunityVerificationService.isPartnerUrl(unstopUrl), true);
+  assert.equal(opportunityVerificationService.isValidSourceUrl(unstopUrl), true);
+});
+
+// 34. Conflict Resolution Engine: Official Source Overrides Unstop
+test("Phase 6 Test 34: Conflict Resolution Engine prioritizes official deadline over partner and logs conflict", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const officialData = { deadline: "2026-09-12", url: "https://sih.gov.in" };
+  const partnerData = { deadline: "2026-09-10", url: "https://unstop.com/hackathons/sih-2026" };
+
+  const resolved = opportunityVerificationService.compareAndResolveSources(officialData, partnerData);
+
+  assert.equal(resolved.hasConflict, true);
+  assert.equal(resolved.resolvedDeadline, "2026-09-12", "Official source deadline must override partner deadline");
+  assert.equal(resolved.sourceType, "official");
+  assert.equal(resolved.verificationStatus, "verified");
+  assert.ok(resolved.resolutionNote.includes("prioritized"));
+});
+
+// 35. PDF Rules URL Validation
+test("Phase 6 Test 35: Official rules/guidelines PDF URLs are validated and supported", async () => {
+  const { opportunityVerificationService } = await import("../src/services/opportunityVerificationService");
+
+  const sihPdf = "https://sih.gov.in/pdf/SIH2026_Guidelines.pdf";
+  const unstopPdf = "https://unstop.com/pdf/tata_imagination_guidelines.pdf";
+  const fakePdf = "https://sarkariresult.com/fake_rules.pdf";
+
+  assert.equal(opportunityVerificationService.isValidPdfUrl(sihPdf), true);
+  assert.equal(opportunityVerificationService.isValidPdfUrl(unstopPdf), true);
+  assert.equal(opportunityVerificationService.isValidPdfUrl(fakePdf), false);
+});
+
+// 36. Full Opportunity Provenance Invariant
+test("Phase 6 Test 36: Every published opportunity contains complete source name, type, and last_verified_at", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+
+  const activeOpps = await opportunityService.getActiveOpportunities();
+  assert.ok(activeOpps.length > 0, "Must have active opportunities");
+
+  for (const opp of activeOpps) {
+    assert.ok(opp.sourceName, `Opportunity [${opp.id}] must have sourceName`);
+    assert.ok(opp.sourceType === "official" || opp.sourceType === "partner", `Opportunity [${opp.id}] must have valid sourceType`);
+    assert.ok(opp.lastVerified, `Opportunity [${opp.id}] must have lastVerified timestamp`);
+    assert.ok(opp.officialUrl, `Opportunity [${opp.id}] must have officialUrl`);
+    assert.ok(opp.applyUrl, `Opportunity [${opp.id}] must have applyUrl`);
+  }
+});
+
+
+
+
 

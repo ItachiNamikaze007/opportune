@@ -71,9 +71,11 @@ desktop.ini
 *.swo
 *~
 
-# Vercel & Turbopack
+# Vercel, Supabase & Turbopack
 .vercel/
 .turbo/
+supabase/.temp/
+supabase/.branches/
 
 # TypeScript cache
 *.tsbuildinfo

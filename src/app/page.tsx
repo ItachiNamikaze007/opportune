@@ -179,7 +179,7 @@ export default function LandingPage() {
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">
                   <p className="text-[11px] text-slate-400 font-medium">Matched For You</p>
-                  <p className="text-xl sm:text-2xl font-black text-white mt-1">47 opportunities</p>
+                  <p className="text-xl sm:text-2xl font-black text-white mt-1">Live Matches</p>
                   <span className="text-[10px] text-emerald-400 font-semibold">● 100% personalized</span>
                 </div>
                 <div className="p-4 rounded-2xl bg-slate-900/80 border border-slate-800">

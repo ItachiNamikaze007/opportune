@@ -28,7 +28,7 @@ import {
 
 export default function OnboardingPage() {
   const router = useRouter();
-  const { studentProfile, updateProfile } = useStudent();
+  const { studentProfile, updateProfile, stats } = useStudent();
   const { showToast } = useToast();
 
   const [currentStep, setCurrentStep] = useState(1);
@@ -513,13 +513,13 @@ export default function OnboardingPage() {
                   You're all set 🎉
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-300 max-w-md mx-auto leading-relaxed">
-                  We've evaluated your degree in <span className="font-semibold text-brand-400">{formData.branch}</span> ({formData.cgpa} CGPA) against 20+ active opportunities.
+                  We've evaluated your degree in <span className="font-semibold text-brand-400">{formData.branch}</span> ({formData.cgpa} CGPA) against {stats.totalCount} active live opportunities.
                 </p>
               </div>
 
               <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 max-w-sm mx-auto text-xs text-emerald-300 font-semibold space-y-1">
-                <p>✓ 47+ Live Opportunities Evaluated</p>
-                <p>✓ Personalized Eligibility Match Active</p>
+                <p>✓ {stats.totalCount} Live Opportunities Evaluated</p>
+                <p>✓ {stats.eligibleCount} Personalized Matches Active</p>
               </div>
 
               <div className="pt-4">

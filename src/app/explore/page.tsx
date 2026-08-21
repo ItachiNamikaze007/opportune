@@ -121,7 +121,7 @@ export default function ExplorePage() {
             Explore Opportunities
           </h1>
           <p className="text-xs text-slate-500 dark:text-slate-400 mt-0.5">
-            Search and filter 20+ verified government schemes, tech hackathons, and research fellowships.
+            Search and filter verified government schemes, tech hackathons, and research fellowships.
           </p>
         </div>
 

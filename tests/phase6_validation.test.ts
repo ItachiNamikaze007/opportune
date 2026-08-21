@@ -425,3 +425,98 @@ test("Phase 6 Test 20: Expired opportunities are never included in active Top Ma
   assert.ok(!activeClosingSoon.some((r) => r.opportunity.id === "real-isro-resp-2025-expired"));
 });
 
+// 21. TCS CodeVita & Past Deadline Exclusion at Service Query Layer
+test("Phase 6 Test 21: getActiveOpportunities strictly excludes expired opportunities including TCS CodeVita", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+  const activeOpps = await opportunityService.getActiveOpportunities();
+
+  // Assert expired opportunities are never returned in active list
+  assert.ok(!activeOpps.some((o) => o.id === "real-tcs-codevita-expired"));
+  assert.ok(!activeOpps.some((o) => o.id === "real-isro-resp-2025-expired"));
+  
+  // Assert every returned opportunity has a valid deadline in the future
+  const now = new Date();
+  for (const opp of activeOpps) {
+    const deadlineDate = new Date(opp.deadline);
+    assert.ok(deadlineDate.getTime() >= now.getTime() - 86400000, `Deadline for [${opp.id}] must be active`);
+    assert.equal(opp.lifecycleStatus, "published");
+  }
+});
+
+// 22. Unpublished, Pending Review, and Rejected Opportunities Are Excluded
+test("Phase 6 Test 22: getActiveOpportunities strictly excludes unpublished or rejected opportunities", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+  const activeOpps = await opportunityService.getActiveOpportunities();
+
+  for (const opp of activeOpps) {
+    assert.equal(opp.lifecycleStatus, "published", `Opportunity [${opp.id}] must have lifecycleStatus=published`);
+    assert.notEqual(opp.verificationStatus, "pending");
+    assert.notEqual(opp.verificationStatus, "needs_review");
+    assert.notEqual(opp.verificationStatus, "expired");
+  }
+});
+
+// 23. Dynamic Student Match Count & Eligibility Differentiation
+test("Phase 6 Test 23: getEligibleOpportunitiesForStudent produces dynamic counts that differ by student profile", async () => {
+  const { opportunityService } = await import("../src/services/opportunityService");
+
+  // Profile A: 4th year CS student with 8.5 CGPA
+  const studentA = testStudent;
+
+  // Profile B: 1st year Civil Engineering student with 6.0 CGPA
+  const studentB: StudentProfile = {
+    name: "Rohan Patel",
+    email: "rohan@example.com",
+    degree: "B.Tech",
+    institution: "State Engineering College",
+    branch: "Civil Engineering",
+    currentYear: 1,
+    graduationYear: 2030,
+    cgpa: 6.0,
+    age: 18,
+    country: "India",
+    state: "Gujarat",
+    city: "Ahmedabad",
+    gender: "male",
+    skills: ["AutoCAD", "Surveying"],
+    interests: ["government_exam"],
+    completedOnboarding: true,
+  };
+
+  const resultA = await opportunityService.getEligibleOpportunitiesForStudent(studentA);
+  const resultB = await opportunityService.getEligibleOpportunitiesForStudent(studentB);
+
+  // Both evaluated the exact same active catalog count
+  assert.equal(resultA.totalActiveEvaluated, resultB.totalActiveEvaluated);
+  assert.ok(resultA.totalActiveEvaluated > 0);
+
+  // But eligibility counts are dynamically calculated and differ based on requirements
+  assert.ok(typeof resultA.eligibleCount === "number");
+  assert.ok(typeof resultB.eligibleCount === "number");
+  assert.notEqual(resultA.eligibleCount, resultB.eligibleCount, "Different student profiles must receive different eligibility counts");
+});
+
+// 24. Zero Hardcoded '47' Count in User-Facing Application
+test("Phase 6 Test 24: No hardcoded '47' or '47+' string remains in user-facing source code", async () => {
+  const fs = await import("fs");
+  const path = await import("path");
+
+  const filesToCheck = [
+    path.join(process.cwd(), "src/app/onboarding/page.tsx"),
+    path.join(process.cwd(), "src/app/dashboard/page.tsx"),
+    path.join(process.cwd(), "src/app/explore/page.tsx"),
+    path.join(process.cwd(), "src/app/page.tsx"),
+    path.join(process.cwd(), "src/context/StudentContext.tsx"),
+    path.join(process.cwd(), "src/services/opportunityService.ts"),
+  ];
+
+  for (const filePath of filesToCheck) {
+    if (fs.existsSync(filePath)) {
+      const content = fs.readFileSync(filePath, "utf-8");
+      assert.ok(!content.includes("47+"), `File ${filePath} must not contain hardcoded '47+'`);
+      assert.ok(!content.includes("47 opportunities"), `File ${filePath} must not contain hardcoded '47 opportunities'`);
+    }
+  }
+});
+
+

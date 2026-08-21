@@ -93,7 +93,7 @@ export default function DashboardPage() {
             className="px-4 py-2.5 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-lg shadow-brand-600/20 flex items-center gap-1.5"
           >
             <Compass className="w-4 h-4" />
-            <span>Explore All 20+ Listings</span>
+            <span>Explore All Opportunities</span>
           </Link>
         </div>
       </div>

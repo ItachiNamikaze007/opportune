@@ -40,26 +40,24 @@ const StudentContext = createContext<StudentContextType | undefined>(undefined);
 
 export const StudentProvider = ({ children }: { children: ReactNode }) => {
   const [studentProfile, setStudentProfile] = useState<StudentProfile>(defaultStudentProfile);
-  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>(
-    realVerifiedOpportunities.filter(
-      (o) => !o.isDemo && o.verificationStatus === "verified" && o.lifecycleStatus === "published"
-    )
-  );
+  const [allOpportunities, setAllOpportunities] = useState<Opportunity[]>([]);
   const [isLoaded, setIsLoaded] = useState(false);
 
-  // Load from studentService (Database or localStorage fallback)
+  // Load from studentService & opportunityService (Database or fallback)
   useEffect(() => {
     async function loadData() {
       try {
         const [profile, opps] = await Promise.all([
           studentService.getStudentProfile(),
-          opportunityService.getOpportunities(),
+          opportunityService.getActiveOpportunities(),
         ]);
         setStudentProfile(profile);
-        if (opps && opps.length > 0) {
+        if (opps) {
           setAllOpportunities(opps);
-          // Pre-evaluate matches in matchingService
-          await matchingService.matchStudentWithCatalog("demo-student-id", profile, opps);
+          if (opps.length > 0) {
+            // Pre-evaluate matches in matchingService
+            await matchingService.matchStudentWithCatalog("demo-student-id", profile, opps);
+          }
         }
       } catch (e) {
         console.error("Failed to load initial student data:", e);
@@ -198,10 +196,12 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
     let closingSoonCount = 0;
     let highMatchCount = 0;
 
+    let activeEvaluatedCount = 0;
     opportunitiesWithEligibility.forEach(({ opportunity, eligibility }) => {
       const statusRes = getOpportunityStatus(opportunity);
 
       if (!statusRes.isExpired) {
+        activeEvaluatedCount++;
         if (eligibility.status === "eligible") {
           eligibleCount++;
         } else if (eligibility.status === "potentially_eligible") {
@@ -219,13 +219,13 @@ export const StudentProvider = ({ children }: { children: ReactNode }) => {
     });
 
     return {
-      totalCount: allOpportunities.length,
+      totalCount: activeEvaluatedCount,
       eligibleCount,
       potentiallyEligibleCount,
       closingSoonCount,
       highMatchCount,
     };
-  }, [opportunitiesWithEligibility, allOpportunities]);
+  }, [opportunitiesWithEligibility]);
 
   return (
     <StudentContext.Provider

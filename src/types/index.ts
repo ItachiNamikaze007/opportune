@@ -141,6 +141,7 @@ export interface Opportunity {
 }
 
 export interface StudentProfile {
+  id?: string;
   name: string;
   email: string;
   phone?: string;

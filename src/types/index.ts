@@ -70,6 +70,8 @@ export type VerificationStatus =
   | "failed"
   | "demo"
   | "needs_review"
+  | "needs_reverification"
+  | "stale"
   | "expired"
   | "community_verified";
 
@@ -87,6 +89,8 @@ export type LifecycleStatus =
   | "pending_review"
   | "verified"
   | "published"
+  | "needs_reverification"
+  | "stale"
   | "expired"
   | "rejected";
 
@@ -113,6 +117,43 @@ export interface ConfidenceBreakdown {
   level: ConfidenceLevel;
 }
 
+export interface ProvenanceClaim {
+  sourceTitle: string;
+  sourceUrl: string;
+  sourceType: SourceProvenanceType;
+  verificationStatus: VerificationStatus;
+  lastVerified: string;
+  contentEvidence: boolean;
+  evidenceText?: string;
+  evidenceLocation?: string;
+}
+
+export interface RevalidationAuditRecord {
+  id: string;
+  opportunityId: string;
+  opportunityTitle: string;
+  oldValues: {
+    deadline?: string;
+    verificationStatus?: VerificationStatus;
+    lifecycleStatus?: LifecycleStatus;
+    applyUrl?: string;
+    rulesPdfUrl?: string;
+  };
+  newValues: {
+    deadline?: string;
+    verificationStatus?: VerificationStatus;
+    lifecycleStatus?: LifecycleStatus;
+    applyUrl?: string;
+    rulesPdfUrl?: string;
+  };
+  changedFields: string[];
+  sourceUrl: string;
+  verificationTimestamp: string;
+  reason: string;
+  isConflict: boolean;
+  httpStatus: number;
+}
+
 export interface Opportunity {
   id: string;
   sourceId?: string;
@@ -135,9 +176,21 @@ export interface Opportunity {
   sourceUrl?: string;
   officialSourceUrl?: string;
   rulesPdfUrl?: string;
+  rulesPdfTitle?: string;
+  rulesPdfSourceType?: "official" | "partner";
   rulesUrl?: string;
   sourceConflict?: boolean;
   sourceMetadata?: Record<string, any>;
+  deadlineSource?: string | ProvenanceClaim;
+  eligibilitySource?: string | ProvenanceClaim;
+  instructionsSource?: string | ProvenanceClaim;
+  applyDestinationType?:
+    | "direct_portal"
+    | "partner_portal"
+    | "spoc_nomination"
+    | "scheduled_window"
+    | "unavailable"
+    | "expired";
   verificationStatus: VerificationStatus;
   lifecycleStatus?: LifecycleStatus;
   confidenceScore?: number;

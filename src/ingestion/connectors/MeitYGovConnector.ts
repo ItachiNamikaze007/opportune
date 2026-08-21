@@ -23,7 +23,7 @@ export class MeitYGovConnector implements OpportunitySourceConnector {
         sourceId: this.sourceId,
         sourceUrl: this.sourceUrl,
         officialUrl: "https://www.meity.gov.in/internship-scheme",
-        applyUrl: "https://meity.gov.in/schemes/apply",
+        applyUrl: "https://www.meity.gov.in/internship-scheme",
         title: "Digital India AI & Quantum Tech Fellowship 2026",
         organization: "Ministry of Electronics & Information Technology (MeitY)",
         categoryRaw: "government_internship",

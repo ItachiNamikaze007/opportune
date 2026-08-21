@@ -24,7 +24,7 @@ export class ISROGovConnector implements OpportunitySourceConnector {
         sourceId: this.sourceId,
         sourceUrl: this.sourceUrl,
         officialUrl: "https://www.isro.gov.in/Careers.html",
-        applyUrl: "https://apps.isro.gov.in/icrb/apply",
+        applyUrl: undefined,
         title: "ISRO Scientist / Engineer SC Recruitment Exam 2026",
         organization: "Indian Space Research Organisation (ISRO)",
         categoryRaw: "government_exam",

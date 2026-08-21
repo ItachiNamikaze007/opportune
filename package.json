@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test tests/ingestion.test.ts tests/e2e.test.ts tests/freshness.test.ts tests/phase6_validation.test.ts"
+    "test": "tsx --test tests/ingestion.test.ts tests/e2e.test.ts tests/freshness.test.ts tests/phase6_validation.test.ts",
+    "test:e2e": "tsx tests/e2e_browser_qa.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
@@ -23,6 +24,7 @@
     "@types/react": "^19.0.8",
     "@types/react-dom": "^19.0.3",
     "autoprefixer": "^10.4.20",
+    "playwright": "^1.62.1",
     "postcss": "^8.4.49",
     "tailwindcss": "^3.4.17",
     "tsx": "^4.23.12",

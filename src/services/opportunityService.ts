@@ -7,6 +7,7 @@ import { appConfig, assertProductionConfig } from "@/lib/config";
 import { getOpportunityStatus } from "@/services/opportunityStatusResolver";
 import { matchingService, RankedOpportunityMatch } from "@/services/matchingService";
 import { opportunityVerificationService } from "@/services/opportunityVerificationService";
+import { opportunityRepository } from "@/repositories/opportunityRepository";
 
 function mapDbToOpportunity(
   dbOpp: DbOpportunity,
@@ -176,16 +177,24 @@ export const opportunityService = {
       }
     }
 
-    // Dev fallback: Filter candidate list strictly through verification service
+    // Dev / Local Repository fallback: Query persistent opportunityRepository
+    const storedAll = await opportunityRepository.getAll();
     const publishedReal = reviewQueueService.getPublishedRealOpportunities();
-    const candidateList = publishedReal.length > 0 ? publishedReal : realVerifiedOpportunities;
+    const candidateMap = new Map<string, Opportunity>();
+    for (const opp of storedAll) {
+      candidateMap.set(opp.id, opp);
+    }
+    for (const opp of publishedReal) {
+      candidateMap.set(opp.id, opp);
+    }
+    const candidateList = Array.from(candidateMap.values());
 
     return candidateList.filter((opp) => {
       const verifyRes = opportunityVerificationService.verifyOpportunity(opp, refDate);
       const statusRes = getOpportunityStatus(opp, refDate);
       return (
         !opp.isDemo &&
-        opp.verificationStatus === "verified" &&
+        (opp.verificationStatus === "verified" || opp.verificationStatus === "partner_verified") &&
         opp.lifecycleStatus === "published" &&
         verifyRes.verified &&
         !verifyRes.isExpired &&
@@ -281,6 +290,9 @@ export const opportunityService = {
     const publishedReal = reviewQueueService.getPublishedRealOpportunities();
     const fromQueue = publishedReal.find((o) => o.id === id);
     if (fromQueue) return fromQueue;
+
+    const fromRepo = await opportunityRepository.getById(id);
+    if (fromRepo) return fromRepo;
 
     const fromReal = realVerifiedOpportunities.find((o) => o.id === id);
     if (fromReal) return fromReal;

@@ -220,16 +220,19 @@ export default function OpportunityDetailPage({
           </div>
 
           <div className="flex flex-wrap items-center gap-2.5 w-full sm:w-auto">
-            {/* Rules / Guidelines PDF Button (Only if URL exists) */}
-            {(opportunity.rulesPdfUrl || opportunity.rulesUrl) && (
+            {/* Rules / Guidelines PDF Button (Only if verified URL exists) */}
+            {opportunity.rulesPdfUrl && (
               <a
-                href={opportunity.rulesPdfUrl || opportunity.rulesUrl}
+                href={opportunity.rulesPdfUrl}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="px-4 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 flex items-center gap-1.5 transition-colors"
               >
                 <FileText className="w-3.5 h-3.5 text-brand-400" />
-                <span>Rules / PDF</span>
+                <span>
+                  {opportunity.rulesPdfTitle ||
+                    (opportunity.rulesPdfSourceType === "partner" ? "Partner Rules (PDF)" : "Official Notification (PDF)")}
+                </span>
                 <ExternalLink className="w-3 h-3 opacity-60" />
               </a>
             )}
@@ -248,15 +251,17 @@ export default function OpportunityDetailPage({
               </a>
             )}
 
-            {/* Apply / Register Button */}
+            {/* Application Action States (4 Mutually Exclusive States) */}
             {statusResult.isExpired ? (
+              // State 4: Application deadline closed
               <button
                 disabled
                 className="px-6 py-3 rounded-2xl bg-slate-800 text-slate-500 font-bold text-xs border border-slate-700 cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span>Applications Closed</span>
               </button>
-            ) : (
+            ) : opportunity.applyUrl ? (
+              // State 1: Direct application available
               <button
                 onClick={handleApplyClick}
                 className="px-6 py-3 rounded-2xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-xl shadow-brand-600/30 flex items-center justify-center gap-1.5"
@@ -264,9 +269,42 @@ export default function OpportunityDetailPage({
                 <span>Apply / Register Now</span>
                 <ExternalLink className="w-3.5 h-3.5" />
               </button>
+            ) : opportunity.applyDestinationType === "spoc_nomination" ? (
+              // State 2: Application is nomination/SPOC based (NO Apply button)
+              <div className="px-5 py-3 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold text-xs flex items-center justify-center gap-2">
+                <span>Nomination via College SPOC</span>
+              </div>
+            ) : (
+              // State 3: Application portal not yet available / Apply via official portal (NO Apply button)
+              <div className="px-5 py-3 rounded-2xl bg-slate-800/80 border border-slate-700 text-slate-400 font-medium text-xs flex items-center justify-center gap-2">
+                <span>Direct Application Link Unavailable</span>
+              </div>
             )}
           </div>
         </div>
+
+        {/* Informative Guidance Banner for SPOC / Scheduled Portals */}
+        {opportunity.applyDestinationType === "spoc_nomination" && !statusResult.isExpired && (
+          <div className="p-4 rounded-2xl bg-amber-950/20 border border-amber-500/30 text-amber-200 text-xs space-y-1 mt-2">
+            <span className="font-bold flex items-center gap-1.5 text-amber-300">
+              <Info className="w-4 h-4" /> Why is there no direct Apply button?
+            </span>
+            <p className="text-slate-300 text-[11px] leading-relaxed">
+              Smart India Hackathon registrations require team submission through your college's designated Internal Hackathon SPOC. Contact your college innovation council / faculty SPOC to participate.
+            </p>
+          </div>
+        )}
+
+        {opportunity.applyDestinationType === "unavailable" && !opportunity.applyUrl && !statusResult.isExpired && (
+          <div className="p-4 rounded-2xl bg-slate-900/60 border border-slate-800 text-slate-300 text-xs space-y-1 mt-2">
+            <span className="font-bold flex items-center gap-1.5 text-blue-400">
+              <Info className="w-4 h-4" /> Centralized Scheme Application Window
+            </span>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Online applications for this scheme/examination open as per official notifications. All eligibility criteria, key dates, and syllabus are self-contained on this page. Click "Official Website" above to verify the official circular.
+            </p>
+          </div>
+        )}
       </div>
 
       {/* WHY YOU'RE ELIGIBLE BREAKDOWN CARD (MANDATORY REQUIREMENT) */}
@@ -497,6 +535,118 @@ export default function OpportunityDetailPage({
                 </div>
               ))}
             </div>
+          </div>
+        )}
+      </div>
+
+      {/* PROVENANCE & VERIFICATION AUDIT TRAIL CARD */}
+      <div className="p-6 rounded-3xl bg-slate-950 border border-slate-800 shadow-xl space-y-3 text-xs">
+        <div className="flex items-center justify-between">
+          <span className="font-bold text-slate-200 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-400" /> Source Provenance & Verification Audit
+          </span>
+          <span className={`px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${
+            opportunity.sourceType === "partner"
+              ? "bg-amber-500/20 text-amber-300 border border-amber-500/30"
+              : "bg-blue-500/20 text-blue-300 border border-blue-500/30"
+          }`}>
+            {opportunity.sourceType === "partner" ? "Partner Verified (Unstop)" : "Official Source"}
+          </span>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-slate-400">
+          <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Deadline Provenance</span>
+            {typeof opportunity.deadlineSource === "object" ? (
+              <div className="space-y-0.5">
+                <p className="text-slate-200 font-semibold">{opportunity.deadlineSource.sourceTitle}</p>
+                <a
+                  href={opportunity.deadlineSource.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-brand-400 hover:text-brand-300 flex items-center gap-1 font-mono truncate"
+                >
+                  <span className="truncate">{opportunity.deadlineSource.sourceUrl}</span>
+                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                </a>
+              </div>
+            ) : (
+              <p className="text-slate-300 font-medium">{opportunity.deadlineSource || "Official Opportunity Page"}</p>
+            )}
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Eligibility Provenance</span>
+            {typeof opportunity.eligibilitySource === "object" ? (
+              <div className="space-y-0.5">
+                <p className="text-slate-200 font-semibold">{opportunity.eligibilitySource.sourceTitle}</p>
+                <a
+                  href={opportunity.eligibilitySource.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-brand-400 hover:text-brand-300 flex items-center gap-1 font-mono truncate"
+                >
+                  <span className="truncate">{opportunity.eligibilitySource.sourceUrl}</span>
+                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                </a>
+              </div>
+            ) : (
+              <p className="text-slate-300 font-medium">{opportunity.eligibilitySource || "Official Opportunity Page"}</p>
+            )}
+          </div>
+          <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-1">
+            <span className="text-[10px] uppercase font-bold text-slate-500">Instructions Source</span>
+            {typeof opportunity.instructionsSource === "object" ? (
+              <div className="space-y-0.5">
+                <p className="text-slate-200 font-semibold">{opportunity.instructionsSource.sourceTitle}</p>
+                <a
+                  href={opportunity.instructionsSource.sourceUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[10px] text-brand-400 hover:text-brand-300 flex items-center gap-1 font-mono truncate"
+                >
+                  <span className="truncate">{opportunity.instructionsSource.sourceUrl}</span>
+                  <ExternalLink className="w-2.5 h-2.5 shrink-0" />
+                </a>
+              </div>
+            ) : (
+              <p className="text-slate-300 font-medium">{opportunity.instructionsSource || "Official Opportunity Page"}</p>
+            )}
+          </div>
+        </div>
+
+        {/* Rules Document Availability Notice */}
+        <div className="p-3 rounded-2xl bg-slate-900/80 border border-slate-800 flex items-center justify-between text-slate-400">
+          <span className="flex items-center gap-2">
+            <FileText className="w-3.5 h-3.5 text-brand-400" />
+            <span className="text-[11px] font-medium">
+              {opportunity.rulesPdfUrl
+                ? `Verified Rules Document: ${opportunity.rulesPdfTitle || (opportunity.rulesPdfSourceType === "partner" ? "Partner Rules (Unstop)" : "Official Notification")}`
+                : "Official rules document not currently available as direct PDF (all critical guidelines are rendered above)"}
+            </span>
+          </span>
+          {opportunity.rulesPdfUrl && (
+            <a
+              href={opportunity.rulesPdfUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[11px] font-bold text-brand-400 hover:text-brand-300 flex items-center gap-1"
+            >
+              Open PDF <ExternalLink className="w-3 h-3" />
+            </a>
+          )}
+        </div>
+
+        {/* Conflict Resolution Audit Alert */}
+        {opportunity.sourceConflict && (
+          <div className="p-3.5 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 space-y-1 mt-2">
+            <div className="flex items-center gap-2 font-bold text-amber-300">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0" />
+              <span>Source Discrepancy Resolved (Official Source Prioritized)</span>
+            </div>
+            <p className="text-[11px] text-amber-200/90 leading-relaxed">
+              {opportunity.sourceMetadata?.conflictResolution ||
+                `Initial listing from ${opportunity.sourceMetadata?.discoverySource || "partner"} cited earlier deadline, but official publisher confirmed ${opportunity.deadline}. In accordance with Opportune conflict resolution policy, official publisher data was adopted as canonical.`}
+            </p>
           </div>
         )}
       </div>

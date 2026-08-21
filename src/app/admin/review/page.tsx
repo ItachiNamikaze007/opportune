@@ -40,15 +40,18 @@ import { appConfig } from "@/lib/config";
 import { catalogAuditService, CatalogAuditReport } from "@/services/catalogAuditService";
 import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
+import { opportunitySyncService, SyncReport } from "@/services/opportunitySyncService";
 
 export default function AdminReviewPage() {
-  const [activeTab, setActiveTab] = useState<"queue" | "sources" | "audit" | "freshness">("queue");
+  const [activeTab, setActiveTab] = useState<"queue" | "sources" | "audit" | "freshness" | "sync">("queue");
   const [reviews, setReviews] = useState<ReviewQueueItem[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState<string>("");
   const [filterStatus, setFilterStatus] = useState<string>("all");
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [isRunningPipeline, setIsRunningPipeline] = useState(false);
+  const [isSyncing, setIsSyncing] = useState(false);
+  const [syncReport, setSyncReport] = useState<SyncReport | null>(null);
   const [sourceMetrics, setSourceMetrics] = useState<SourceHealthMetrics[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [analytics, setAnalytics] = useState<SystemAnalyticsSummary | null>(null);
@@ -144,6 +147,29 @@ export default function AdminReviewPage() {
     }
   };
 
+  const handleTriggerSync = async () => {
+    setIsSyncing(true);
+    try {
+      const res = await fetch("/api/opportunities/sync", { method: "POST" });
+      const data = await res.json();
+      if (data.success && data.report) {
+        setSyncReport(data.report);
+        showToast(
+          "Dynamic Sync Completed 🎉",
+          `Discovered: ${data.report.discovered}, Revalidated: ${data.report.verified}, Updated: ${data.report.updated}`,
+          "success"
+        );
+      } else {
+        showToast("Sync Error", data.error || "Failed to run sync pipeline", "error");
+      }
+      loadData();
+    } catch (e: any) {
+      showToast("Sync Failed", e.message || "Error communicating with sync endpoint", "error");
+    } finally {
+      setIsSyncing(false);
+    }
+  };
+
   const filteredReviews = reviews.filter((r) => {
     if (filterStatus !== "all" && r.reviewStatus !== filterStatus) return false;
     if (searchTerm) {
@@ -185,6 +211,14 @@ export default function AdminReviewPage() {
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={handleTriggerSync}
+              disabled={isSyncing}
+              className="px-4 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin" : ""}`} />
+              {isSyncing ? "Syncing Sources..." : "Run Dynamic Sync"}
+            </button>
             <button
               onClick={handleRunAllConnectors}
               disabled={isRunningPipeline}
@@ -235,6 +269,16 @@ export default function AdminReviewPage() {
             }`}
           >
             <ShieldCheck className="w-4 h-4" /> Review Queue ({reviews.length})
+          </button>
+          <button
+            onClick={() => setActiveTab("sync")}
+            className={`pb-3 border-b-2 transition-all flex items-center gap-2 ${
+              activeTab === "sync"
+                ? "border-brand-500 text-brand-400"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <RefreshCw className="w-4 h-4" /> Dynamic Discovery & Sync
           </button>
           <button
             onClick={() => setActiveTab("sources")}
@@ -539,6 +583,88 @@ export default function AdminReviewPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: DYNAMIC DISCOVERY & SYNC */}
+        {activeTab === "sync" && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <RefreshCw className={`w-5 h-5 text-emerald-400 ${isSyncing ? "animate-spin" : ""}`} />
+                    Dynamic Opportunity Discovery & Source Revalidation
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1">
+                    Crawl authorized official seeds up to depth-2, discover new candidate links from real HTML anchors, reverify existing catalog, and resolve official-vs-partner conflicts with zero fabricated URLs.
+                  </p>
+                </div>
+                <button
+                  onClick={handleTriggerSync}
+                  disabled={isSyncing}
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-lg flex items-center gap-2 shrink-0 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-4 h-4 ${isSyncing ? "animate-spin" : ""}`} />
+                  {isSyncing ? "Executing Discovery & Sync..." : "Trigger Discovery & Sync Now"}
+                </button>
+              </div>
+
+              {/* Live Metric Cards */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3 pt-2">
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Discovered</div>
+                  <div className="text-xl font-bold text-blue-400">{syncReport?.discovered ?? 0}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Verified</div>
+                  <div className="text-xl font-bold text-emerald-400">{syncReport?.verified ?? 8}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Published Active</div>
+                  <div className="text-xl font-bold text-teal-400">{syncReport?.published ?? 8}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Revalidated / Updated</div>
+                  <div className="text-xl font-bold text-amber-400">{syncReport?.updated ?? 0}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Expired Excluded</div>
+                  <div className="text-xl font-bold text-purple-400">{syncReport?.expired ?? 2}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Conflicts Resolved</div>
+                  <div className="text-xl font-bold text-orange-400">{syncReport?.conflicts ?? 0}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Failures</div>
+                  <div className="text-xl font-bold text-rose-400">{syncReport?.failures ?? 0}</div>
+                </div>
+              </div>
+
+              {/* Status Banner */}
+              <div className="p-4 rounded-xl bg-slate-950/50 border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs">
+                <div className="flex items-center gap-2">
+                  <span className={`w-2 h-2 rounded-full ${syncReport?.status === "failed" ? "bg-rose-500" : "bg-emerald-400"} animate-pulse`} />
+                  <span className="text-slate-300 font-medium">
+                    {syncReport ? `Sync Status: ${syncReport.status.toUpperCase()} (${syncReport.verified} verified, ${syncReport.discovered} discovered)` : "Engine Status: Ready to execute live sync"}
+                  </span>
+                </div>
+                <div className="text-slate-400 font-mono text-[11px] flex flex-col sm:items-end">
+                  <div>Last Sync: {syncReport?.completedAt || syncReport?.timestamp ? new Date(syncReport.completedAt || syncReport.timestamp).toLocaleString() : "Awaiting initial trigger"} {syncReport?.durationMs ? `(${syncReport.durationMs}ms)` : ""}</div>
+                  {syncReport?.lastSuccessfulSync && (
+                    <div className="text-emerald-400/80 text-[10px]">Last Successful: {new Date(syncReport.lastSuccessfulSync).toLocaleString()}</div>
+                  )}
+                </div>
+              </div>
+
+              {syncReport?.lastError && (
+                <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-center gap-2">
+                  <AlertCircle className="w-4 h-4 shrink-0" />
+                  <span>Last Sync Notice: {syncReport.lastError}</span>
+                </div>
+              )}
             </div>
           </div>
         )}

@@ -33,7 +33,7 @@ export class GovPortalConnector implements OpportunitySourceConnector {
         sourceId: this.sourceId,
         sourceUrl: this.sourceUrl,
         officialUrl: "https://niti.gov.in/internship-scheme",
-        applyUrl: "https://niti.gov.in/internship-scheme/apply",
+        applyUrl: undefined,
         title: "NITI Aayog National Internship Scheme (Winter Batch 2026)",
         organization: "NITI Aayog, Government of India",
         categoryRaw: "government_internship",

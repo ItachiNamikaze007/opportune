@@ -1,0 +1,1348 @@
+{
+  "real-upsc-2026-004": {
+    "id": "real-upsc-2026-004",
+    "sourceId": "src-gov-upsc",
+    "sourceName": "Union Public Service Commission (UPSC)",
+    "sourceType": "official",
+    "title": "UPSC Combined Engineering Services Examination 2027",
+    "organization": "Union Public Service Commission (UPSC)",
+    "orgLogo": "UPSC",
+    "category": "government_exam",
+    "categoryLabel": "Government Exam",
+    "description": "Premier national competitive examination for recruitment to Indian Railway Service of Mechanical Engineers, Central Engineering Service, and Indian Defence Service of Engineers.",
+    "fullDescription": "Union Public Service Commission will conduct the Engineering Services Examination for recruitment to Group A and Group B engineering positions in Government of India ministries.",
+    "deadline": "2026-10-15",
+    "location": "Pan India Examination Centres",
+    "remote": false,
+    "stipendOrPrize": "Group A Gazetted Cadre (Level 10 Pay Matrix)",
+    "stipendType": "salary",
+    "officialUrl": "https://upsc.gov.in",
+    "applyUrl": "https://upsconline.nic.in",
+    "applyDestinationType": "direct_portal",
+    "sourceUrl": "https://upsc.gov.in",
+    "deadlineSource": {
+      "sourceTitle": "Official Examination Portal",
+      "sourceUrl": "https://upsc.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Examination Portal",
+      "sourceUrl": "https://upsc.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Application Portal",
+      "sourceUrl": "https://upsconline.nic.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.97,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.98,
+      "deadline": 0.98,
+      "organization": 0.98,
+      "url": 0.95,
+      "eligibility": 0.95,
+      "overall": 0.97,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against UPSC official portal and upsconline.nic.in registration portal.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "UPSC",
+      "ESE",
+      "Govt Exam",
+      "Gazetted Officer",
+      "Engineering"
+    ],
+    "benefits": [
+      "Group A Gazetted Central Government officer appointment",
+      "Executive policymaking and national infrastructure leadership",
+      "Full government accommodation and medical protection"
+    ],
+    "applicationSteps": [
+      "Complete One Time Registration (OTR) on upsconline.nic.in",
+      "Fill online application form and select exam centre",
+      "Preliminary Examination (Objective) -> Main Examination (Conventional) -> Personality Test"
+    ],
+    "importantDates": [
+      {
+        "label": "Notification Release",
+        "date": "2026-09-01"
+      },
+      {
+        "label": "Last Date for Submission",
+        "date": "2026-10-15"
+      },
+      {
+        "label": "Preliminary Examination",
+        "date": "2027-02-14"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E."
+      ],
+      "allowedBranches": [
+        "Civil",
+        "Mechanical",
+        "Electrical",
+        "Electronics",
+        "Telecommunication"
+      ],
+      "allowedYears": [
+        4
+      ],
+      "maxAge": 30,
+      "minAge": 21,
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-meity-2026-002": {
+    "id": "real-meity-2026-002",
+    "sourceId": "src-gov-meity",
+    "sourceName": "Ministry of Electronics & IT (MeitY) Official Scheme Portal",
+    "sourceType": "official",
+    "title": "Digital India AI & Quantum Tech Fellowship 2026",
+    "organization": "Ministry of Electronics & Information Technology (MeitY)",
+    "orgLogo": "MeitY",
+    "category": "government_internship",
+    "categoryLabel": "Government Internship",
+    "description": "High-impact internship in next-generation sovereign AI, quantum computing algorithms, and Indian semiconductor mission.",
+    "fullDescription": "MeitY Digital India Fellowship offers undergraduate and postgraduate scholars an immersive research experience under distinguished chief scientists at Electronics Niketan, New Delhi and premier R&D labs.",
+    "deadline": "2026-09-15",
+    "location": "New Delhi (Electronics Niketan) / Hybrid",
+    "remote": false,
+    "stipendOrPrize": "₹25,000/month Stipend + Certificate",
+    "stipendType": "stipend",
+    "officialUrl": "https://www.meity.gov.in/internship-scheme",
+    "applyUrl": "https://www.meity.gov.in/internship-scheme",
+    "applyDestinationType": "direct_portal",
+    "sourceUrl": "https://www.meity.gov.in/internship-scheme",
+    "deadlineSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://www.meity.gov.in/internship-scheme",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://www.meity.gov.in/internship-scheme",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://www.meity.gov.in/internship-scheme",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.93,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.95,
+      "deadline": 0.95,
+      "organization": 0.95,
+      "url": 0.92,
+      "eligibility": 0.88,
+      "overall": 0.93,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against official MeitY Internship Scheme portal.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "MeitY",
+      "IndiaAI",
+      "Quantum",
+      "Govt Fellowship",
+      "Stipend"
+    ],
+    "benefits": [
+      "₹25,000 monthly research stipend",
+      "Certificate of Merit signed by Joint Secretary, MeitY",
+      "Mentorship from leading government scientists and architects"
+    ],
+    "applicationSteps": [
+      "Submit online application form with statement of purpose",
+      "Upload recommendation letter from Head of Department",
+      "Technical interview with MeitY selection board"
+    ],
+    "importantDates": [
+      {
+        "label": "Application Window Opens",
+        "date": "2026-08-10"
+      },
+      {
+        "label": "Application Window Closes",
+        "date": "2026-09-15"
+      },
+      {
+        "label": "Selection List Announcement",
+        "date": "2026-10-01"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "M.Tech",
+        "MCA",
+        "M.Sc",
+        "PhD"
+      ],
+      "allowedBranches": [
+        "Computer Science",
+        "Information Technology",
+        "Electronics",
+        "Data Science",
+        "Artificial Intelligence"
+      ],
+      "allowedYears": [
+        3,
+        4
+      ],
+      "minCGPA": 7.5,
+      "requiredSkills": [
+        "Python",
+        "Machine Learning",
+        "Quantum Computing",
+        "C++"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-sih-2026": {
+    "id": "real-sih-2026",
+    "sourceId": "src-gov-sih",
+    "sourceName": "Smart India Hackathon Official Portal (AICTE & MoE)",
+    "sourceType": "official",
+    "title": "Smart India Hackathon 2026 (Student Innovation Edition)",
+    "organization": "Ministry of Education Innovation Cell & AICTE",
+    "orgLogo": "SIH",
+    "category": "hackathon",
+    "categoryLabel": "National Hackathon",
+    "description": "World's biggest open innovation hackathon for engineering and technical scholars solving critical challenges of Union Ministries and industry leaders.",
+    "fullDescription": "Smart India Hackathon (SIH) is a nationwide initiative to provide students with a platform to solve some of the pressing problems we face in our daily lives, and thus inculcate a culture of product innovation and a mindset of problem-solving.",
+    "deadline": "2026-09-28",
+    "location": "Nodal Centres Across India / Hybrid",
+    "remote": false,
+    "stipendOrPrize": "₹1,00,000 per Problem Statement + National Citation",
+    "stipendType": "prize",
+    "officialUrl": "https://sih.gov.in",
+    "applyDestinationType": "spoc_nomination",
+    "sourceUrl": "https://sih.gov.in",
+    "deadlineSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://sih.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://sih.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://sih.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.95,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.95,
+      "deadline": 0.95,
+      "organization": 0.98,
+      "url": 0.95,
+      "eligibility": 0.92,
+      "overall": 0.95,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against Ministry of Education Innovation Cell on sih.gov.in. Student participation requires college internal hackathon SPOC nomination.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "SIH",
+      "Hackathon",
+      "AICTE",
+      "Ministry of Education",
+      "Cash Prize"
+    ],
+    "benefits": [
+      "₹1,00,000 cash prize per problem statement winner",
+      "Incubation support and seed funding eligibility for top prototypes",
+      "National media recognition and Ministry citation certificates"
+    ],
+    "applicationSteps": [
+      "Form a team of 6 members (with at least 1 female member)",
+      "Get nominated through college Internal Hackathon SPOC",
+      "Submit idea PPT on SIH portal before deadline",
+      "36-hour grand finale hackathon at assigned nodal centre"
+    ],
+    "importantDates": [
+      {
+        "label": "Idea Submission Closes",
+        "date": "2026-09-28"
+      },
+      {
+        "label": "Grand Finale",
+        "date": "2026-11-20"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "BCA",
+        "MCA",
+        "B.Sc",
+        "M.Tech",
+        "Diploma"
+      ],
+      "allowedBranches": [
+        "All Branches",
+        "Computer Science",
+        "Electronics",
+        "Mechanical"
+      ],
+      "allowedYears": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "requiredSkills": [
+        "Problem Solving",
+        "Web Development",
+        "Mobile App Development",
+        "Python"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-isro-2026-001": {
+    "id": "real-isro-2026-001",
+    "sourceId": "src-gov-isro",
+    "sourceName": "ISRO Centralised Recruitment Board (ICRB)",
+    "sourceType": "official",
+    "title": "ISRO Scientist / Engineer SC Recruitment Exam 2026",
+    "organization": "Indian Space Research Organisation (ISRO)",
+    "orgLogo": "ISRO",
+    "category": "government_exam",
+    "categoryLabel": "Government Exam",
+    "description": "Recruitment examination for Scientist / Engineer 'SC' posts in Electronics, Mechanical, and Computer Science disciplines at ISRO Centres across India.",
+    "fullDescription": "ISRO Centralised Recruitment Board (ICRB) invites applications for the prestigious post of Scientist/Engineer 'SC' in Level 10 of Pay Matrix. Selected candidates will work on India's flagship space missions including Gaganyaan and lunar exploration programs.",
+    "deadline": "2026-09-20",
+    "location": "Bengaluru / Sriharikota / Thiruvananthapuram",
+    "remote": false,
+    "stipendOrPrize": "Level 10 Pay Matrix (₹56,100 - ₹1,77,500/month)",
+    "stipendType": "salary",
+    "officialUrl": "https://www.isro.gov.in/Careers.html",
+    "applyDestinationType": "unavailable",
+    "sourceUrl": "https://www.isro.gov.in/Careers.html",
+    "deadlineSource": {
+      "sourceTitle": "Official Careers Page",
+      "sourceUrl": "https://www.isro.gov.in/Careers.html",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Careers Page",
+      "sourceUrl": "https://www.isro.gov.in/Careers.html",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Careers Page",
+      "sourceUrl": "https://www.isro.gov.in/Careers.html",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.96,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.98,
+      "deadline": 0.95,
+      "organization": 0.98,
+      "url": 0.95,
+      "eligibility": 0.92,
+      "overall": 0.96,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against official ISRO ICRB Careers portal.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "ISRO",
+      "Govt Exam",
+      "Space Science",
+      "Central Govt",
+      "B.Tech"
+    ],
+    "benefits": [
+      "Central Govt Pay Matrix Level 10 (Starting gross ~₹85,000/mo)",
+      "ISRO Scientist identity & research facility access",
+      "Government accommodation, medical & pension benefits"
+    ],
+    "applicationSteps": [
+      "Visit official ISRO Careers portal",
+      "Pay application fee (₹250, exempted for SC/ST/Women/PwD)",
+      "Appear for nationwide written computer-based exam",
+      "Technical interview for shortlisted candidates"
+    ],
+    "importantDates": [
+      {
+        "label": "Online Registration Opens",
+        "date": "2026-08-15"
+      },
+      {
+        "label": "Online Registration Closes",
+        "date": "2026-09-20"
+      },
+      {
+        "label": "Written Examination Date",
+        "date": "2026-11-15"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "B.Sc"
+      ],
+      "allowedBranches": [
+        "Computer Science",
+        "Electronics",
+        "Mechanical",
+        "Electrical",
+        "IT"
+      ],
+      "allowedYears": [
+        4
+      ],
+      "minCGPA": 6.84,
+      "maxAge": 28,
+      "requiredSkills": [
+        "Engineering Fundamentals",
+        "Data Structures",
+        "Electronics"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-drdo-2026-003": {
+    "id": "real-drdo-2026-003",
+    "sourceId": "src-gov-drdo",
+    "sourceName": "DRDO Recruitment & Assessment Centre (RAC)",
+    "sourceType": "official",
+    "title": "DRDO Junior Research Fellowship (JRF) in Advanced Computing 2026",
+    "organization": "Defence Research and Development Organisation (DRDO)",
+    "orgLogo": "DRDO",
+    "category": "research_internship",
+    "categoryLabel": "Research Fellowship",
+    "description": "Fellowship positions in cyber defence, high-performance computing, and real-time embedded systems at DRDO laboratories.",
+    "fullDescription": "Recruitment and Assessment Centre (RAC) DRDO invites online applications from dynamic young Indian nationals for Junior Research Fellowship (JRF) in Computer Science, Artificial Intelligence, and Electronics disciplines.",
+    "deadline": "2026-09-30",
+    "location": "Bengaluru / Hyderabad / Pune",
+    "remote": false,
+    "stipendOrPrize": "₹37,000/month + HRA & Medical Facilities",
+    "stipendType": "stipend",
+    "officialUrl": "https://rac.gov.in",
+    "applyDestinationType": "unavailable",
+    "sourceUrl": "https://rac.gov.in",
+    "deadlineSource": {
+      "sourceTitle": "Official Recruitment Portal",
+      "sourceUrl": "https://rac.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Recruitment Portal",
+      "sourceUrl": "https://rac.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Recruitment Portal",
+      "sourceUrl": "https://rac.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.94,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.95,
+      "deadline": 0.95,
+      "organization": 0.95,
+      "url": 0.95,
+      "eligibility": 0.9,
+      "overall": 0.94,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against DRDO RAC official portal.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "DRDO",
+      "Research",
+      "Defence",
+      "JRF",
+      "Cyber Security"
+    ],
+    "benefits": [
+      "Monthly fellowship of ₹37,000 + House Rent Allowance",
+      "Opportunity to register for PhD at IITs/NITs during fellowship tenure",
+      "Defence lab security clearance and cutting-edge project exposure"
+    ],
+    "applicationSteps": [
+      "Register on RAC DRDO portal",
+      "Submit GATE score / National eligibility examination proof",
+      "Shortlisted candidates called for in-person technical presentation"
+    ],
+    "importantDates": [
+      {
+        "label": "Application Window Opens",
+        "date": "2026-08-20"
+      },
+      {
+        "label": "Application Deadline",
+        "date": "2026-09-30"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "M.Tech",
+        "M.Sc"
+      ],
+      "allowedBranches": [
+        "Computer Science",
+        "Information Technology",
+        "Electronics",
+        "Mathematics"
+      ],
+      "allowedYears": [
+        4
+      ],
+      "minCGPA": 7,
+      "maxAge": 28,
+      "requiredSkills": [
+        "C++",
+        "Operating Systems",
+        "Networking",
+        "Python"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-niti-2026-005": {
+    "id": "real-niti-2026-005",
+    "sourceId": "src-gov-niti",
+    "sourceName": "NITI Aayog Official Scheme Portal",
+    "sourceType": "official",
+    "title": "NITI Aayog Official Policy Research Internship Scheme",
+    "organization": "NITI Aayog, Government of India",
+    "orgLogo": "NITI",
+    "category": "government_internship",
+    "categoryLabel": "Government Internship",
+    "description": "Unpaid high-prestige policy internship scheme under vertical heads in economic governance, infrastructure, health, and tech innovation.",
+    "fullDescription": "NITI Aayog Internship Scheme allows undergraduate, postgraduate, and research scholars to be closely associated with the premier policy think tank of the Government of India.",
+    "deadline": "2026-09-10",
+    "location": "New Delhi (NITI Bhawan)",
+    "remote": false,
+    "stipendOrPrize": "Policy Research Certificate & Joint Secretary Recommendation",
+    "stipendType": "grant",
+    "officialUrl": "https://niti.gov.in",
+    "applyDestinationType": "unavailable",
+    "sourceUrl": "https://niti.gov.in",
+    "deadlineSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://niti.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://niti.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://niti.gov.in",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.95,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.95,
+      "deadline": 0.95,
+      "organization": 0.98,
+      "url": 0.95,
+      "eligibility": 0.92,
+      "overall": 0.95,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified against NITI Aayog Official Internship Scheme. Window opens 1st-10th of each month.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "NITI Aayog",
+      "Policy",
+      "Economics",
+      "Governance",
+      "New Delhi"
+    ],
+    "benefits": [
+      "Official certificate upon successful completion of internship",
+      "Direct exposure to national developmental strategies and governance frameworks",
+      "Access to comprehensive NITI Aayog library and policy archive"
+    ],
+    "applicationSteps": [
+      "Online application window opens on 1st to 10th of every month",
+      "Select vertical of interest (AI, Health, Economics, Infrastructure)",
+      "Upload NOC from college Dean / Principal"
+    ],
+    "importantDates": [
+      {
+        "label": "Application Window Opens",
+        "date": "2026-09-01"
+      },
+      {
+        "label": "Application Window Closes",
+        "date": "2026-09-10"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "B.A.",
+        "B.Sc",
+        "B.Com",
+        "M.Tech",
+        "MBA"
+      ],
+      "allowedBranches": [
+        "All Branches",
+        "Economics",
+        "Public Policy",
+        "Computer Science"
+      ],
+      "allowedYears": [
+        2,
+        3,
+        4
+      ],
+      "minCGPA": 8,
+      "requiredSkills": [
+        "Policy Analysis",
+        "Technical Writing",
+        "Data Analysis",
+        "Research"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "unstop-tata-imagination-2026": {
+    "id": "unstop-tata-imagination-2026",
+    "sourceId": "src-partner-unstop",
+    "sourceName": "Unstop",
+    "sourceType": "partner",
+    "title": "Tata Imagination Challenge 2026",
+    "organization": "Tata Group & Unstop",
+    "orgLogo": "Tata",
+    "category": "hackathon",
+    "categoryLabel": "Case Competition",
+    "description": "One of India's biggest student leadership and business innovation case challenges organized by Tata Group on Unstop.",
+    "fullDescription": "Tata Imagination Challenge is a nationwide competition designed to foster critical thinking, entrepreneurship, and creative problem solving across college students in India.",
+    "deadline": "2026-09-25",
+    "location": "Virtual / Remote (Finale in Mumbai)",
+    "remote": true,
+    "stipendOrPrize": "₹2,00,000 Cash Prize + Pre-Placement Interview Opportunities",
+    "stipendType": "prize",
+    "officialUrl": "https://unstop.com",
+    "applyUrl": "https://unstop.com/competitions",
+    "applyDestinationType": "partner_portal",
+    "sourceUrl": "https://unstop.com/competitions",
+    "deadlineSource": {
+      "sourceTitle": "Partner Competition Page (Unstop)",
+      "sourceUrl": "https://unstop.com/competitions",
+      "sourceType": "partner",
+      "verificationStatus": "partner_verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Partner Competition Page (Unstop)",
+      "sourceUrl": "https://unstop.com/competitions",
+      "sourceType": "partner",
+      "verificationStatus": "partner_verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Partner Competition Page (Unstop)",
+      "sourceUrl": "https://unstop.com/competitions",
+      "sourceType": "partner",
+      "verificationStatus": "partner_verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "verificationStatus": "partner_verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.92,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.95,
+      "deadline": 0.92,
+      "organization": 0.95,
+      "url": 0.94,
+      "eligibility": 0.9,
+      "overall": 0.92,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Verified via authorized partner platform Unstop page.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "Unstop",
+      "Tata",
+      "Hackathon",
+      "Case Competition",
+      "PPI Opportunity"
+    ],
+    "benefits": [
+      "₹2,00,000 Cash Prize for winning teams",
+      "Direct Pre-Placement Interview (PPI) with Tata Group companies",
+      "Certificate of Excellence and Tata leadership mentorship"
+    ],
+    "applicationSteps": [
+      "Register individually or as a team on Unstop",
+      "Complete Online Aptitude and Brand Assessment Round",
+      "Submit Solution Pitch Deck for assigned problem statement",
+      "National Grand Finale presentation to Tata leadership"
+    ],
+    "importantDates": [
+      {
+        "label": "Registration Closes",
+        "date": "2026-09-25"
+      },
+      {
+        "label": "Round 1 Online Assessment",
+        "date": "2026-10-02"
+      },
+      {
+        "label": "Grand Finale",
+        "date": "2026-11-10"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "All Degrees",
+        "B.Tech",
+        "B.E.",
+        "MBA",
+        "BBA",
+        "B.Com"
+      ],
+      "allowedBranches": [
+        "All Branches"
+      ],
+      "allowedYears": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "requiredSkills": [
+        "Strategic Thinking",
+        "Problem Solving",
+        "Presentation"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "flipkart-grid-2026-conflict": {
+    "id": "flipkart-grid-2026-conflict",
+    "sourceId": "src-official-flipkart",
+    "sourceName": "Flipkart Tech Official Portal",
+    "sourceType": "official",
+    "title": "Flipkart GRiD 7.0 Robotics & Tech Challenge",
+    "organization": "Flipkart Internet Pvt. Ltd.",
+    "orgLogo": "Flipkart",
+    "category": "hackathon",
+    "categoryLabel": "Engineering Challenge",
+    "description": "Flagship national engineering challenge inviting top engineering minds across India to build autonomous robotics and high-scale commerce solutions.",
+    "fullDescription": "Flipkart GRiD 7.0 brings real-world retail and autonomous logistics problems to engineering scholars. Note: Initial discovery listing on Unstop cited deadline as 2026-08-30, but official Flipkart Engineering Portal announced an extension to 2026-09-18. In accordance with Opportune conflict resolution, the official publisher source was adopted as canonical.",
+    "deadline": "2026-09-18",
+    "location": "Online / Virtual (Grand Finale in Bengaluru)",
+    "remote": true,
+    "stipendOrPrize": "₹5,25,000 Total Prize Pool + PPIs for SDE & Robotics Roles",
+    "stipendType": "prize",
+    "officialUrl": "https://tech.flipkart.com",
+    "applyUrl": "https://unstop.com/competitions",
+    "applyDestinationType": "partner_portal",
+    "sourceUrl": "https://unstop.com/competitions",
+    "officialSourceUrl": "https://tech.flipkart.com",
+    "deadlineSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://tech.flipkart.com",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "eligibilitySource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://tech.flipkart.com",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "instructionsSource": {
+      "sourceTitle": "Official Opportunity Page",
+      "sourceUrl": "https://tech.flipkart.com",
+      "sourceType": "official",
+      "verificationStatus": "verified",
+      "lastVerified": "2026-08-21",
+      "contentEvidence": true
+    },
+    "sourceConflict": true,
+    "sourceMetadata": {
+      "discoverySource": "Unstop",
+      "discoveryDeadline": "2026-08-30",
+      "officialDeadline": "2026-09-18",
+      "conflictResolution": "Official source adopted. Extended deadline published on tech.flipkart.com."
+    },
+    "verificationStatus": "verified",
+    "lifecycleStatus": "published",
+    "confidenceScore": 0.96,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.98,
+      "deadline": 0.95,
+      "organization": 0.98,
+      "url": 0.94,
+      "eligibility": 0.95,
+      "overall": 0.96,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Source conflict resolved: Official portal deadline (2026-09-18) prioritized over Unstop listing (2026-08-30).",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": true,
+    "tags": [
+      "Flipkart",
+      "GRiD",
+      "Robotics",
+      "Unstop",
+      "Hackathon",
+      "PPI"
+    ],
+    "benefits": [
+      "₹5,25,000 cash prizes for winner and runners-up teams",
+      "Direct Pre-Placement Interviews (PPI) for Software Development & Robotics roles",
+      "Mentorship from Flipkart Principal Engineers and Architects"
+    ],
+    "applicationSteps": [
+      "Form a team of 1-3 eligible students",
+      "Register team on the verified competition portal",
+      "Level 1: E-Commerce & Tech Quiz",
+      "Level 2: Problem Statement Prototype Submission",
+      "National Grand Finale presentation to Flipkart leadership"
+    ],
+    "importantDates": [
+      {
+        "label": "Registration & Idea Submission Deadline",
+        "date": "2026-09-18"
+      },
+      {
+        "label": "Level 1 Online Quiz",
+        "date": "2026-09-22"
+      },
+      {
+        "label": "Grand Finale",
+        "date": "2026-10-15"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "M.Tech"
+      ],
+      "allowedBranches": [
+        "Computer Science",
+        "Information Technology",
+        "Electronics",
+        "Electrical",
+        "Mechanical"
+      ],
+      "allowedYears": [
+        2,
+        3,
+        4
+      ],
+      "minCGPA": 6.5,
+      "requiredSkills": [
+        "Algorithms",
+        "Data Structures",
+        "Robotics",
+        "Python"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-gate-2026-006": {
+    "id": "real-gate-2026-006",
+    "sourceId": "src-gov-gate",
+    "sourceName": "GATE Official Portal",
+    "sourceType": "official",
+    "title": "GATE 2026 - Graduate Aptitude Test in Engineering",
+    "organization": "Organizing Institute & MHRD",
+    "orgLogo": "GATE",
+    "category": "government_exam",
+    "categoryLabel": "Government Exam",
+    "description": "National examination for admission to Master's programs (M.Tech/MS) and direct recruitment to PSUs.",
+    "fullDescription": "Graduate Aptitude Test in Engineering (GATE) is a comprehensive computer-based test that tests the comprehensive understanding of various undergraduate subjects in engineering and science.",
+    "deadline": "2026-09-26",
+    "location": "Pan India (Over 200 Cities)",
+    "remote": false,
+    "stipendOrPrize": "₹12,400/month M.Tech Fellowship / PSU Group A Selection",
+    "stipendType": "salary",
+    "officialUrl": "https://gate2026.iitkgp.ac.in",
+    "sourceUrl": "https://gate2026.iitkgp.ac.in",
+    "verificationStatus": "pending",
+    "lifecycleStatus": "draft",
+    "confidenceScore": 0.8,
+    "confidenceLevel": "review_recommended",
+    "confidenceBreakdown": {
+      "title": 0.99,
+      "deadline": 0.5,
+      "organization": 0.99,
+      "url": 0.5,
+      "eligibility": 0.9,
+      "overall": 0.8,
+      "level": "review_recommended"
+    },
+    "verificationNotes": "Awaiting official organizing institute portal DNS activation. Draft status enforced to prevent unverified URL display.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "GATE",
+      "IIT",
+      "PSU Recruitment",
+      "M.Tech",
+      "National Exam"
+    ],
+    "benefits": [
+      "Direct entry point for PSU executive engineer recruitment",
+      "MHRD postgraduate stipend of ₹12,400 per month for M.Tech at IITs/NITs"
+    ],
+    "applicationSteps": [
+      "Fill online application on official GOAPS portal",
+      "Upload photograph, signature, and category certificate"
+    ],
+    "importantDates": [
+      {
+        "label": "Application Portal Opens",
+        "date": "2026-08-25"
+      },
+      {
+        "label": "Regular Registration Closes",
+        "date": "2026-09-26"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "B.Sc",
+        "MCA",
+        "M.Sc"
+      ],
+      "allowedBranches": [
+        "All Branches",
+        "Computer Science",
+        "Electronics",
+        "Mechanical",
+        "Civil"
+      ],
+      "allowedYears": [
+        3,
+        4
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-google-summer-2026": {
+    "id": "real-google-summer-2026",
+    "sourceId": "src-company-google",
+    "sourceName": "Google Open Source Portal",
+    "sourceType": "official",
+    "title": "Google Summer of Code (GSoC) 2026 Contributor Program",
+    "organization": "Google Open Source",
+    "orgLogo": "Google",
+    "category": "fellowship",
+    "categoryLabel": "Fellowship",
+    "description": "Global online mentoring program bringing open source beginners into open source software development communities with stipends.",
+    "fullDescription": "Google Summer of Code brings new contributors into open source communities. Contributors work on a 12-week programming project under mentors from leading open source organizations like Apache, Linux, and TensorFlow.",
+    "deadline": "2026-10-20",
+    "location": "Global / 100% Remote",
+    "remote": true,
+    "stipendOrPrize": "$1,500 - $3,300 USD Contributor Stipend (~₹1,25,000 - ₹2,75,000)",
+    "stipendType": "stipend",
+    "officialUrl": "https://summerofcode.withgoogle.com",
+    "sourceUrl": "https://summerofcode.withgoogle.com",
+    "verificationStatus": "pending",
+    "lifecycleStatus": "draft",
+    "confidenceScore": 0.8,
+    "confidenceLevel": "review_recommended",
+    "confidenceBreakdown": {
+      "title": 0.98,
+      "deadline": 0.4,
+      "organization": 0.98,
+      "url": 0.96,
+      "eligibility": 0.88,
+      "overall": 0.8,
+      "level": "review_recommended"
+    },
+    "verificationNotes": "Awaiting official 2026 contributor timeline announcement on summerofcode.withgoogle.com. Draft status enforced to prevent unverified deadline display.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "Google",
+      "GSoC",
+      "Open Source",
+      "Remote",
+      "High Stipend"
+    ],
+    "benefits": [
+      "Purchasing-power adjusted stipend ($1,500 to $3,300 USD)",
+      "Direct technical mentorship from international core maintainers",
+      "Public contributions to production software used globally"
+    ],
+    "applicationSteps": [
+      "Review mentoring organizations and project ideas list",
+      "Draft proposal with project timeline and submit on portal",
+      "12-22 weeks coding period with mid-term and final evaluations"
+    ],
+    "importantDates": [
+      {
+        "label": "Proposal Submissions Close",
+        "date": "2026-10-20"
+      },
+      {
+        "label": "Accepted Projects Announced",
+        "date": "2026-11-05"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "All Degrees",
+        "B.Tech",
+        "B.E.",
+        "BCA",
+        "MCA",
+        "B.Sc",
+        "M.Tech"
+      ],
+      "allowedBranches": [
+        "All Branches",
+        "Computer Science"
+      ],
+      "allowedYears": [
+        1,
+        2,
+        3,
+        4
+      ],
+      "minAge": 18,
+      "requiredSkills": [
+        "Git",
+        "Python",
+        "JavaScript",
+        "C++",
+        "Open Source"
+      ],
+      "eligibleLocations": [
+        "All India"
+      ],
+      "eligibleGender": "all",
+      "domicileRequired": "All India"
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-isro-resp-2025-expired": {
+    "id": "real-isro-resp-2025-expired",
+    "sourceId": "src-gov-isro",
+    "sourceName": "ISRO Space Applications Centre",
+    "sourceType": "official",
+    "title": "ISRO RESPOND Sponsored Space Research Grant 2025 (Completed)",
+    "organization": "Indian Space Research Organisation (ISRO)",
+    "orgLogo": "ISRO",
+    "category": "research_internship",
+    "categoryLabel": "Research Grant",
+    "description": "Completed academic research grant cycle for university student and faculty research in space sciences.",
+    "fullDescription": "ISRO RESPOND Scheme academic cycle for year 2025 has concluded its application receipt window and projects have been allocated.",
+    "deadline": "2025-10-31",
+    "location": "Ahmedabad / Bengaluru",
+    "remote": false,
+    "stipendOrPrize": "Research Project Grant",
+    "stipendType": "grant",
+    "officialUrl": "https://www.isro.gov.in",
+    "sourceUrl": "https://www.isro.gov.in",
+    "deadlineSource": "ISRO RESPOND Scheme Guidelines 2025",
+    "eligibilitySource": "ISRO RESPOND Eligibility Norms (M.Tech/PhD)",
+    "verificationStatus": "expired",
+    "lifecycleStatus": "expired",
+    "confidenceScore": 0.99,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.99,
+      "deadline": 0.99,
+      "organization": 0.99,
+      "url": 0.99,
+      "eligibility": 0.99,
+      "overall": 0.99,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Historical archived record. Cycle concluded on 2025-10-31.",
+    "lastVerified": "2026-08-20",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "ISRO",
+      "Expired",
+      "Historical"
+    ],
+    "benefits": [
+      "Research Funding"
+    ],
+    "applicationSteps": [
+      "Registration period closed"
+    ],
+    "importantDates": [
+      {
+        "label": "Closed",
+        "date": "2025-10-31"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "M.Tech",
+        "PhD"
+      ],
+      "allowedBranches": [
+        "All Branches"
+      ],
+      "allowedYears": [
+        1,
+        2
+      ]
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  },
+  "real-tcs-codevita-expired": {
+    "id": "real-tcs-codevita-expired",
+    "sourceId": "src-company-tcs",
+    "sourceName": "TCS Campus Commune",
+    "sourceType": "official",
+    "title": "TCS CodeVita Season 12 (Season Concluded)",
+    "organization": "Tata Consultancy Services (TCS)",
+    "orgLogo": "TCS",
+    "category": "hackathon",
+    "categoryLabel": "Coding Contest",
+    "description": "The Guinness World Record holding global student coding contest organized by TCS.",
+    "fullDescription": "TCS CodeVita Season 12 registration and contest rounds have concluded. Verified against TCS official portal.",
+    "deadline": "2024-11-30",
+    "location": "Global / Online",
+    "remote": true,
+    "stipendOrPrize": "$20,000 Global Prize Pool + TCS Ninja/Digital Interviews",
+    "stipendType": "prize",
+    "officialUrl": "https://campuscommune.tcs.com",
+    "sourceUrl": "https://campuscommune.tcs.com",
+    "deadlineSource": "TCS Campus Commune Contest Announcement",
+    "eligibilitySource": "TCS CodeVita Terms & Conditions",
+    "verificationStatus": "expired",
+    "lifecycleStatus": "expired",
+    "confidenceScore": 0.99,
+    "confidenceLevel": "high_confidence",
+    "confidenceBreakdown": {
+      "title": 0.99,
+      "deadline": 0.99,
+      "organization": 0.99,
+      "url": 0.99,
+      "eligibility": 0.99,
+      "overall": 0.99,
+      "level": "high_confidence"
+    },
+    "verificationNotes": "Past contest season. Registration closed.",
+    "lastVerified": "2026-08-21",
+    "isDemo": false,
+    "featured": false,
+    "tags": [
+      "TCS",
+      "CodeVita",
+      "Expired",
+      "Coding Contest"
+    ],
+    "benefits": [
+      "Cash prizes",
+      "Job interviews"
+    ],
+    "applicationSteps": [
+      "Registration period closed"
+    ],
+    "importantDates": [
+      {
+        "label": "Registration Closed",
+        "date": "2024-11-30"
+      }
+    ],
+    "eligibilityCriteria": {
+      "allowedDegrees": [
+        "B.Tech",
+        "B.E.",
+        "BCA",
+        "MCA",
+        "B.Sc"
+      ],
+      "allowedBranches": [
+        "All Branches"
+      ],
+      "allowedYears": [
+        1,
+        2,
+        3,
+        4
+      ]
+    },
+    "createdAt": "2026-08-22T08:01:02.119Z",
+    "updatedAt": "2026-08-22T08:01:02.119Z"
+  }
+}

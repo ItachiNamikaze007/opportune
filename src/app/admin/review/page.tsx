@@ -43,6 +43,7 @@ import { mockOpportunities } from "@/data/mockOpportunities";
 import { opportunitySyncService, SyncReport } from "@/services/opportunitySyncService";
 import { linkedinDiscoveryService } from "@/services/linkedinDiscoveryService";
 import { opportunityDiscoveryService } from "@/services/opportunityDiscoveryService";
+import { verificationDiagnosticsService } from "@/services/verificationDiagnosticsService";
 import { DiscoveryCandidate } from "@/types";
 
 export default function AdminReviewPage() {
@@ -84,16 +85,16 @@ export default function AdminReviewPage() {
   const handleRunMultiSourceDiscovery = async () => {
     setIsDiscoveringMultiSource(true);
     try {
-      const res = await opportunityDiscoveryService.runMultiSourceDiscovery();
-      setMultiSourceMetrics(res.metrics);
+      const res = await opportunityDiscoveryService.runRealWebCrawlerDiscovery();
+      setMultiSourceMetrics(res.telemetry);
       showToast(
-        "Multi-Source Discovery Completed 🎉",
-        `Scraped ${res.candidates.length} candidates, published ${res.publishedCount} new verified opportunities to Opportune website.`,
+        "Web Crawler Discovery Completed 🎉",
+        `Discovered ${res.candidates.length} candidates, published ${res.publishedCount} new verified opportunities to Opportune website.`,
         "success"
       );
       loadData();
     } catch (err: any) {
-      showToast("Discovery Error", err.message || "Failed to run multi-source discovery", "error");
+      showToast("Discovery Error", err.message || "Failed to run web crawler discovery", "error");
     } finally {
       setIsDiscoveringMultiSource(false);
     }
@@ -737,31 +738,33 @@ export default function AdminReviewPage() {
                         <tr className="border-b border-slate-800 text-slate-400 font-semibold">
                           <th className="py-2 px-3">Source Name</th>
                           <th className="py-2 px-3">Type</th>
-                          <th className="py-2 px-3 text-center">Discovered</th>
-                          <th className="py-2 px-3 text-center">New</th>
-                          <th className="py-2 px-3 text-center">Pending</th>
+                          <th className="py-2 px-3 text-center">Pages Fetched</th>
+                          <th className="py-2 px-3 text-center">Found</th>
+                          <th className="py-2 px-3 text-center">Normalized</th>
                           <th className="py-2 px-3 text-center">Verified</th>
                           <th className="py-2 px-3 text-center">Rejected</th>
-                          <th className="py-2 px-3 text-center">Conflicts</th>
+                          <th className="py-2 px-3 text-center">Duplicates</th>
+                          <th className="py-2 px-3 text-center">Rate Limited</th>
                           <th className="py-2 px-3 text-center">Failures</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
                         {multiSourceMetrics.map((m) => (
-                          <tr key={m.sourceId} className="hover:bg-slate-900/40">
+                          <tr key={m.sourceName} className="hover:bg-slate-900/40">
                             <td className="py-2 px-3 font-sans font-semibold text-white">{m.sourceName}</td>
                             <td className="py-2 px-3 font-sans">
                               <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold bg-slate-800 text-slate-300">
                                 {m.sourceType}
                               </span>
                             </td>
-                            <td className="py-2 px-3 text-center text-amber-400">{m.discovered}</td>
-                            <td className="py-2 px-3 text-center text-blue-400">{m.newCandidates}</td>
-                            <td className="py-2 px-3 text-center text-slate-300">{m.pending}</td>
-                            <td className="py-2 px-3 text-center text-emerald-400">{m.verified}</td>
-                            <td className="py-2 px-3 text-center text-red-400">{m.rejected}</td>
-                            <td className="py-2 px-3 text-center text-purple-400">{m.conflicts}</td>
-                            <td className="py-2 px-3 text-center text-rose-400">{m.failures}</td>
+                            <td className="py-2 px-3 text-center text-cyan-400">{m.pagesFetched || 0}</td>
+                            <td className="py-2 px-3 text-center text-amber-400">{m.candidatesFound || 0}</td>
+                            <td className="py-2 px-3 text-center text-blue-400">{m.candidatesNormalized || 0}</td>
+                            <td className="py-2 px-3 text-center text-emerald-400">{m.candidatesVerified || 0}</td>
+                            <td className="py-2 px-3 text-center text-red-400">{m.candidatesRejected || 0}</td>
+                            <td className="py-2 px-3 text-center text-purple-400">{m.duplicates || 0}</td>
+                            <td className="py-2 px-3 text-center text-orange-400">{m.rateLimited || 0}</td>
+                            <td className="py-2 px-3 text-center text-rose-400">{m.failures || 0}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -769,6 +772,98 @@ export default function AdminReviewPage() {
                   </div>
                 </div>
               )}
+
+              {/* VERIFICATION DEBUG & DIAGNOSTICS SECTION */}
+              <div className="pt-4 border-t border-slate-800 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-sm font-bold text-amber-400 flex items-center gap-2">
+                      <ShieldCheck className="w-4 h-4" /> Verification Debug & Diagnostic Breakdown
+                    </h4>
+                    <p className="text-xs text-slate-400">
+                      Real-time diagnostic reasons detailing why candidates are published, held in pending verification, or deduplicated.
+                    </p>
+                  </div>
+                  <div className="text-xs font-mono text-slate-400 bg-slate-900 px-3 py-1 rounded-lg border border-slate-800">
+                    Source Conversion: <span className="text-emerald-400 font-bold">{verificationDiagnosticsService.getSourceConversionMetrics().reduce((acc, m) => acc + m.published, 0)}</span> / {verificationDiagnosticsService.getAllDiagnostics().length} Published
+                  </div>
+                </div>
+
+                {/* Diagnostic Records Table */}
+                {verificationDiagnosticsService.getAllDiagnostics().length > 0 && (
+                  <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-slate-400 font-semibold bg-slate-900/50">
+                          <th className="py-2.5 px-3">Candidate Title</th>
+                          <th className="py-2.5 px-3">Source</th>
+                          <th className="py-2.5 px-3 text-center">Official URL</th>
+                          <th className="py-2.5 px-3 text-center">HTTP Reachable</th>
+                          <th className="py-2.5 px-3 text-center">Score</th>
+                          <th className="py-2.5 px-3 text-center">Decision</th>
+                          <th className="py-2.5 px-3">Diagnostic Reason & Missing Evidence</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 font-sans">
+                        {verificationDiagnosticsService.getAllDiagnostics().map((rec) => (
+                          <tr key={rec.candidateId} className="hover:bg-slate-900/40">
+                            <td className="py-2.5 px-3 font-semibold text-white max-w-[200px] truncate" title={rec.candidateTitle}>
+                              {rec.candidateTitle}
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-300">{rec.sourceName}</td>
+                            <td className="py-2.5 px-3 text-center">
+                              {rec.officialUrlFound ? (
+                                <span className="text-emerald-400 font-bold">Yes</span>
+                              ) : (
+                                <span className="text-slate-500">No</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              {rec.officialUrlReachable ? (
+                                <span className="text-emerald-400 font-bold">Yes</span>
+                              ) : (
+                                <span className="text-rose-400 font-bold">No</span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 text-center font-mono font-bold text-cyan-400">
+                              {rec.confidenceScore}%
+                            </td>
+                            <td className="py-2.5 px-3 text-center">
+                              {rec.finalDecision === "published" && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                  PUBLISHED
+                                </span>
+                              )}
+                              {rec.finalDecision === "pending" && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                                  PENDING
+                                </span>
+                              )}
+                              {rec.finalDecision === "rejected" && (
+                                <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-rose-500/10 text-rose-400 border border-rose-500/20">
+                                  REJECTED
+                                </span>
+                              )}
+                            </td>
+                            <td className="py-2.5 px-3 text-slate-300">
+                              <div>{rec.reason}</div>
+                              {rec.missingEvidence && rec.missingEvidence.length > 0 && (
+                                <div className="flex flex-wrap gap-1 mt-1">
+                                  {rec.missingEvidence.map((ev, i) => (
+                                    <span key={i} className="px-1.5 py-0.5 rounded text-[9px] bg-rose-950/60 text-rose-300 border border-rose-800/40">
+                                      Missing: {ev}
+                                    </span>
+                                  ))}
+                                </div>
+                              )}
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                )}
+              </div>
             </div>
 
             {/* Candidates List */}

@@ -7,11 +7,12 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test tests/ingestion.test.ts tests/e2e.test.ts tests/freshness.test.ts tests/linkedin_discovery.test.ts tests/phase6_validation.test.ts",
+    "test": "tsx --test tests/pipeline_diagnostics.test.ts tests/crawler_integration.test.ts tests/multi_source_discovery.test.ts tests/semantic_search.test.ts tests/linkedin_discovery.test.ts tests/production_validation.test.ts tests/ingestion.test.ts tests/freshness.test.ts",
     "test:e2e": "tsx tests/e2e_browser_qa.mjs"
   },
   "dependencies": {
     "@supabase/supabase-js": "^2.112.3",
+    "cheerio": "^1.2.0",
     "clsx": "^2.1.1",
     "lucide-react": "^0.475.0",
     "next": "^15.1.7",

@@ -229,6 +229,8 @@ export interface Opportunity {
   applicationSteps?: string[];
   tags?: string[];
   featured?: boolean;
+  createdAt?: string;
+  updatedAt?: string;
 }
 
 export interface StudentProfile {

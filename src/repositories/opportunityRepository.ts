@@ -15,29 +15,158 @@ export interface IOpportunityRepository {
 }
 
 export class OpportunityRepository implements IOpportunityRepository {
-  private store: Map<string, Opportunity> = new Map();
-  private auditHistory: RevalidationAuditRecord[] = [];
-  private initialized = false;
+  private dbPath: string = "";
+  private auditDbPath: string = "";
+  private isServer: boolean;
 
   constructor() {
-    this.initializeFromSeed();
-  }
+    this.isServer = typeof window === "undefined";
 
-  private initializeFromSeed(): void {
-    if (this.initialized) return;
-    for (const opp of realVerifiedOpportunities) {
-      this.store.set(opp.id, { ...opp });
+    if (this.isServer) {
+      try {
+        const req = eval("require");
+        const path = req("path");
+        const fs = req("fs");
+        const dataDir = path.join(process.cwd(), "src", "data");
+        if (!fs.existsSync(dataDir)) {
+          fs.mkdirSync(dataDir, { recursive: true });
+        }
+        this.dbPath = path.join(dataDir, "persistentOpportunities.json");
+        this.auditDbPath = path.join(dataDir, "persistentAuditLogs.json");
+      } catch (err) {
+        console.warn("[OpportunityRepository] Server path resolve note:", err);
+      }
     }
-    this.initialized = true;
+
+    this.ensureDatabaseSeeded();
   }
 
   /**
-   * Returns all active, published, and unexpired opportunities.
+   * Initializes persistent database with seed data if file/storage does not exist.
+   */
+  private ensureDatabaseSeeded(): void {
+    if (this.isServer && this.dbPath) {
+      try {
+        const req = eval("require");
+        const fs = req("fs");
+        if (!fs.existsSync(this.dbPath)) {
+          const initialMap: Record<string, Opportunity> = {};
+          const nowIso = new Date().toISOString();
+
+          for (const opp of realVerifiedOpportunities) {
+            initialMap[opp.id] = {
+              ...opp,
+              createdAt: opp.createdAt || nowIso,
+              updatedAt: opp.updatedAt || nowIso,
+            };
+          }
+          this.saveStoreToDisk(initialMap);
+        }
+
+        if (!fs.existsSync(this.auditDbPath)) {
+          fs.writeFileSync(this.auditDbPath, JSON.stringify([], null, 2), "utf-8");
+        }
+      } catch (err) {
+        console.warn("[OpportunityRepository] Server seed error:", err);
+      }
+    } else if (!this.isServer) {
+      try {
+        if (!localStorage.getItem("opportune_persistent_db")) {
+          const initialMap: Record<string, Opportunity> = {};
+          for (const opp of realVerifiedOpportunities) {
+            initialMap[opp.id] = { ...opp };
+          }
+          localStorage.setItem("opportune_persistent_db", JSON.stringify(initialMap));
+        }
+      } catch {
+        // Browser storage fallback
+      }
+    }
+  }
+
+  private readStoreFromDisk(): Record<string, Opportunity> {
+    if (this.isServer && this.dbPath) {
+      try {
+        const fs = eval("require")("fs");
+        if (fs.existsSync(this.dbPath)) {
+          const raw = fs.readFileSync(this.dbPath, "utf-8");
+          return JSON.parse(raw) || {};
+        }
+      } catch (err) {
+        console.error("[OpportunityRepository] Server DB read error:", err);
+      }
+    } else if (!this.isServer) {
+      try {
+        const raw = localStorage.getItem("opportune_persistent_db");
+        if (raw) return JSON.parse(raw);
+      } catch {
+        // Browser fallback
+      }
+    }
+
+    // Default seed map fallback if unreadable
+    const fallback: Record<string, Opportunity> = {};
+    for (const opp of realVerifiedOpportunities) {
+      fallback[opp.id] = { ...opp };
+    }
+    return fallback;
+  }
+
+  private saveStoreToDisk(store: Record<string, Opportunity>): void {
+    if (this.isServer && this.dbPath) {
+      try {
+        const fs = eval("require")("fs");
+        const tempPath = `${this.dbPath}.tmp`;
+        fs.writeFileSync(tempPath, JSON.stringify(store, null, 2), "utf-8");
+        fs.renameSync(tempPath, this.dbPath); // Atomic file write
+      } catch (err) {
+        console.error("[OpportunityRepository] Server DB write error:", err);
+      }
+    } else if (!this.isServer) {
+      try {
+        localStorage.setItem("opportune_persistent_db", JSON.stringify(store));
+      } catch {
+        // Browser fallback
+      }
+    }
+  }
+
+  private readAuditFromDisk(): RevalidationAuditRecord[] {
+    if (this.isServer && this.auditDbPath) {
+      try {
+        const fs = eval("require")("fs");
+        if (fs.existsSync(this.auditDbPath)) {
+          const raw = fs.readFileSync(this.auditDbPath, "utf-8");
+          return JSON.parse(raw) || [];
+        }
+      } catch {
+        // Ignore read error
+      }
+    }
+    return [];
+  }
+
+  private saveAuditToDisk(records: RevalidationAuditRecord[]): void {
+    if (this.isServer && this.auditDbPath) {
+      try {
+        const fs = eval("require")("fs");
+        const tempPath = `${this.auditDbPath}.tmp`;
+        fs.writeFileSync(tempPath, JSON.stringify(records, null, 2), "utf-8");
+        fs.renameSync(tempPath, this.auditDbPath);
+      } catch (err) {
+        console.error("[OpportunityRepository] Audit write error:", err);
+      }
+    }
+  }
+
+  /**
+   * Returns all active, published, and unexpired opportunities from database.
    */
   async getAllActive(): Promise<Opportunity[]> {
-    this.initializeFromSeed();
+    const store = this.readStoreFromDisk();
     const todayIso = new Date().toISOString().split("T")[0];
-    return Array.from(this.store.values()).filter((opp) => {
+
+    return Object.values(store).filter((opp) => {
       const isPublished = opp.lifecycleStatus === "published" || !opp.lifecycleStatus;
       const isVerified =
         opp.verificationStatus === "verified" ||
@@ -50,120 +179,151 @@ export class OpportunityRepository implements IOpportunityRepository {
   }
 
   /**
-   * Returns all stored opportunities regardless of status.
+   * Returns all stored opportunities from database regardless of status.
    */
   async getAll(): Promise<Opportunity[]> {
-    this.initializeFromSeed();
-    return Array.from(this.store.values());
+    const store = this.readStoreFromDisk();
+    return Object.values(store);
   }
 
   /**
-   * Finds an opportunity by ID.
+   * Finds an opportunity by ID in persistent database.
    */
   async getById(id: string): Promise<Opportunity | null> {
-    this.initializeFromSeed();
-    const found = this.store.get(id);
+    const store = this.readStoreFromDisk();
+    const found = store[id];
     return found ? { ...found } : null;
   }
 
   /**
-   * Inserts or updates an opportunity.
+   * Upserts opportunity with Unique Constraints:
+   * 1. Unique Canonical URL (officialUrl)
+   * 2. Unique Title + Organization
    */
   async upsert(opportunity: Opportunity): Promise<Opportunity> {
-    this.initializeFromSeed();
-    const cloned = { ...opportunity };
-    this.store.set(opportunity.id, cloned);
-    return { ...cloned };
+    const store = this.readStoreFromDisk();
+    const nowIso = new Date().toISOString();
+
+    // Check Unique Constraint on Canonical URL
+    if (opportunity.officialUrl) {
+      const normCanonical = opportunity.officialUrl.toLowerCase().trim().replace(/\/$/, "");
+      for (const existing of Object.values(store)) {
+        if (existing.id !== opportunity.id && existing.officialUrl) {
+          const existingNorm = existing.officialUrl.toLowerCase().trim().replace(/\/$/, "");
+          if (existingNorm === normCanonical) {
+            const updated = {
+              ...existing,
+              ...opportunity,
+              id: existing.id, // Preserve original PK ID
+              updatedAt: nowIso,
+            };
+            store[existing.id] = updated;
+            this.saveStoreToDisk(store);
+            return updated;
+          }
+        }
+      }
+    }
+
+    // Check Unique Constraint on Title + Organization
+    const normTitleOrg = `${opportunity.title.toLowerCase().trim()}|${opportunity.organization.toLowerCase().trim()}`;
+    for (const existing of Object.values(store)) {
+      if (existing.id !== opportunity.id) {
+        const existingNorm = `${existing.title.toLowerCase().trim()}|${existing.organization.toLowerCase().trim()}`;
+        if (existingNorm === normTitleOrg) {
+          const updated = {
+            ...existing,
+            ...opportunity,
+            id: existing.id,
+            updatedAt: nowIso,
+          };
+          store[existing.id] = updated;
+          this.saveStoreToDisk(store);
+          return updated;
+        }
+      }
+    }
+
+    // New or updated record insertion
+    const isNew = !store[opportunity.id];
+    const record: Opportunity = {
+      ...opportunity,
+      createdAt: isNew ? nowIso : (store[opportunity.id].createdAt || nowIso),
+      updatedAt: nowIso,
+    };
+
+    store[record.id] = record;
+    this.saveStoreToDisk(store);
+    return record;
   }
 
-  /**
-   * Updates specific fields of an opportunity.
-   */
   async update(id: string, updates: Partial<Opportunity>): Promise<Opportunity> {
-    this.initializeFromSeed();
-    const existing = this.store.get(id);
+    const store = this.readStoreFromDisk();
+    const existing = store[id];
     if (!existing) {
-      throw new Error(`Opportunity with ID "${id}" not found in repository.`);
+      throw new Error(`Opportunity with ID "${id}" not found in persistent database.`);
     }
+
     const updated: Opportunity = {
       ...existing,
       ...updates,
-      id: existing.id, // ID is immutable
+      id: existing.id,
+      updatedAt: new Date().toISOString(),
     };
-    this.store.set(id, updated);
-    return { ...updated };
+
+    store[id] = updated;
+    this.saveStoreToDisk(store);
+    return updated;
   }
 
-  /**
-   * Archives an opportunity by setting its lifecycleStatus to 'rejected' or 'expired'.
-   */
   async archive(id: string): Promise<void> {
-    this.initializeFromSeed();
-    const existing = this.store.get(id);
-    if (existing) {
-      this.store.set(id, {
-        ...existing,
-        lifecycleStatus: "rejected",
-        verificationStatus: "failed",
-      });
+    const store = this.readStoreFromDisk();
+    if (store[id]) {
+      store[id].lifecycleStatus = "expired";
+      store[id].updatedAt = new Date().toISOString();
+      this.saveStoreToDisk(store);
     }
   }
 
-  /**
-   * Finds an opportunity by exact canonical official URL or source URL.
-   */
   async findByCanonicalUrl(url: string): Promise<Opportunity | null> {
-    this.initializeFromSeed();
-    const cleanUrl = url.trim().toLowerCase().replace(/\/$/, "");
-    for (const opp of this.store.values()) {
-      const oppOfficial = (opp.officialUrl || "").trim().toLowerCase().replace(/\/$/, "");
-      const oppSource = (opp.sourceUrl || "").trim().toLowerCase().replace(/\/$/, "");
-      if (oppOfficial === cleanUrl || oppSource === cleanUrl) {
+    if (!url) return null;
+    const store = this.readStoreFromDisk();
+    const target = url.toLowerCase().trim().replace(/\/$/, "");
+
+    for (const opp of Object.values(store)) {
+      if (opp.officialUrl && opp.officialUrl.toLowerCase().trim().replace(/\/$/, "") === target) {
+        return { ...opp };
+      }
+      if (opp.sourceUrl && opp.sourceUrl.toLowerCase().trim().replace(/\/$/, "") === target) {
         return { ...opp };
       }
     }
     return null;
   }
 
-  /**
-   * Finds an opportunity by exact or normalized title.
-   */
   async findByTitle(title: string): Promise<Opportunity | null> {
-    this.initializeFromSeed();
-    const norm = title.trim().toLowerCase();
-    for (const opp of this.store.values()) {
-      if (opp.title.trim().toLowerCase() === norm) {
+    if (!title) return null;
+    const store = this.readStoreFromDisk();
+    const target = title.toLowerCase().trim();
+
+    for (const opp of Object.values(store)) {
+      if (opp.title.toLowerCase().trim() === target) {
         return { ...opp };
       }
     }
     return null;
   }
 
-  /**
-   * Returns audit history, optionally filtered by opportunity ID.
-   */
   async getAuditHistory(opportunityId?: string): Promise<RevalidationAuditRecord[]> {
-    if (!opportunityId) {
-      return [...this.auditHistory];
-    }
-    return this.auditHistory.filter((rec) => rec.opportunityId === opportunityId);
+    const records = this.readAuditFromDisk();
+    if (!opportunityId) return records;
+    return records.filter((r) => r.opportunityId === opportunityId);
   }
 
-  /**
-   * Appends an audit record.
-   */
   async addAuditRecord(record: RevalidationAuditRecord): Promise<void> {
-    this.auditHistory.push(record);
-  }
-
-  /**
-   * Resets repository to the base seed (useful for isolated unit testing).
-   */
-  resetToSeed(): void {
-    this.store.clear();
-    this.auditHistory = [];
-    this.initialized = false;
-    this.initializeFromSeed();
+    const records = this.readAuditFromDisk();
+    records.push(record);
+    this.saveAuditToDisk(records);
   }
 }
 

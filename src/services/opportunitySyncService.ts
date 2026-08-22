@@ -114,8 +114,8 @@ export class OpportunitySyncService {
       // 2. DISCOVER NEW CANDIDATE OPPORTUNITIES ACROSS ALL SOURCES
       if (!options.skipDiscovery) {
         try {
-          // Trigger multi-source discovery across configured public adapters
-          const multiSourceResult = await opportunityDiscoveryService.runMultiSourceDiscovery();
+          // Trigger real web crawler discovery across configured public adapters
+          const multiSourceResult = await opportunityDiscoveryService.runRealWebCrawlerDiscovery();
           report.discovered = multiSourceResult.candidates.length;
 
           // Also execute seed crawler discovery for HTML links

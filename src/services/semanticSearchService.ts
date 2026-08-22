@@ -1,9 +1,11 @@
-import type {
+import {
   Opportunity,
   OpportunityCategory,
+  CanonicalCategory,
   Degree,
   StudentProfile,
   EligibilityResult,
+  toCanonicalCategory,
 } from "@/types";
 import { getOpportunityStatus } from "./opportunityStatusResolver";
 import { opportunityVerificationService } from "./opportunityVerificationService";
@@ -183,15 +185,16 @@ export class SemanticSearchService {
         return false;
       }
 
-      // RULE 3: INTENT CATEGORY MATCHING (NO FALSE CATEGORY MATCHING)
+      // RULE 3: STRICT CANONICAL CATEGORY MATCHING (ZERO CATEGORY LEAKAGE)
       const targetCategory = filters.category && filters.category !== "all" ? filters.category : intent.category;
 
       if (targetCategory && targetCategory !== "all") {
         if (targetCategory === "government_all") {
           const sourceNameLower = (opportunity.sourceName || "").toLowerCase();
           const orgLower = (opportunity.organization || "").toLowerCase();
+          const oppCategory = toCanonicalCategory(opportunity.primaryCategory || opportunity.category);
           const isGovCategory =
-            opportunity.category === "government_exam" ||
+            oppCategory === "government_exam" ||
             opportunity.category === "government_internship" ||
             opportunity.sourceType === "official" ||
             sourceNameLower.includes("ministry") ||
@@ -206,23 +209,12 @@ export class SemanticSearchService {
             orgLower.includes("upsc");
 
           if (!isGovCategory) return false;
-        } else if (targetCategory === "private_internship" || targetCategory === "internship") {
-          const isInternship =
-            opportunity.category === "private_internship" ||
-            opportunity.category === "government_internship" ||
-            opportunity.title.toLowerCase().includes("internship");
-
-          if (!isInternship) return false;
-        } else if (targetCategory === "research_internship" || targetCategory === "fellowship") {
-          const isFellowship =
-            opportunity.category === "research_internship" ||
-            opportunity.category === "fellowship" ||
-            opportunity.title.toLowerCase().includes("fellowship");
-
-          if (!isFellowship) return false;
         } else {
-          // Exact category match required!
-          if (opportunity.category !== targetCategory) {
+          // Exact Canonical Category Match Required — Zero Category Leakage!
+          const oppCanonical = toCanonicalCategory(opportunity.primaryCategory || opportunity.category);
+          const targetCanonical = toCanonicalCategory(targetCategory);
+
+          if (oppCanonical !== targetCanonical) {
             return false;
           }
         }

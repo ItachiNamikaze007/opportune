@@ -1,4 +1,14 @@
+export type CanonicalCategory =
+  | "hackathon"
+  | "scholarship"
+  | "internship"
+  | "fellowship"
+  | "competition"
+  | "research"
+  | "government_exam";
+
 export type OpportunityCategory =
+  | CanonicalCategory
   | "government_exam"
   | "government_internship"
   | "private_internship"
@@ -9,6 +19,19 @@ export type OpportunityCategory =
   | "research_internship"
   | "fellowship"
   | "international_opportunity";
+
+export function toCanonicalCategory(cat?: string | OpportunityCategory): CanonicalCategory {
+  if (!cat) return "internship";
+  const c = cat.toLowerCase().trim();
+  if (c === "hackathon") return "hackathon";
+  if (c === "scholarship") return "scholarship";
+  if (c === "government_exam" || c === "exam" || c === "recruitment") return "government_exam";
+  if (c === "fellowship") return "fellowship";
+  if (c === "competition" || c === "contest") return "competition";
+  if (c === "research" || c === "research_internship") return "research";
+  if (c === "internship" || c === "government_internship" || c === "private_internship" || c === "job") return "internship";
+  return "internship";
+}
 
 export type Degree =
   | "B.Tech"
@@ -187,6 +210,7 @@ export interface Opportunity {
   organization: string;
   orgLogo?: string; // initial or badge icon
   category: OpportunityCategory;
+  primaryCategory?: CanonicalCategory;
   categoryLabel: string;
   description: string;
   fullDescription: string;

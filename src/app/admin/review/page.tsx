@@ -789,6 +789,37 @@ export default function AdminReviewPage() {
                   </div>
                 </div>
 
+                {/* CATEGORY DIAGNOSTIC BREAKDOWN TABLE */}
+                <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80 mb-4">
+                  <div className="px-3 py-2 border-b border-slate-800 font-bold text-xs text-brand-400">
+                    CANONICAL CATEGORY DIAGNOSTIC MATRIX
+                  </div>
+                  <table className="w-full text-xs text-left border-collapse font-mono">
+                    <thead>
+                      <tr className="border-b border-slate-800 text-slate-400 font-semibold bg-slate-900/50">
+                        <th className="py-2 px-3 font-sans">Category</th>
+                        <th className="py-2 px-3 text-center">Discovered</th>
+                        <th className="py-2 px-3 text-center">Normalized</th>
+                        <th className="py-2 px-3 text-center">Verified</th>
+                        <th className="py-2 px-3 text-center">Published</th>
+                        <th className="py-2 px-3 text-center">Public Search Eligible</th>
+                      </tr>
+                    </thead>
+                    <tbody className="divide-y divide-slate-800/60 text-[11px]">
+                      {verificationDiagnosticsService.getCategoryDiagnosticBreakdown().map((cat) => (
+                        <tr key={cat.category} className="hover:bg-slate-900/40">
+                          <td className="py-2 px-3 font-sans font-bold text-white uppercase">{cat.category}</td>
+                          <td className="py-2 px-3 text-center text-cyan-400">{cat.discovered}</td>
+                          <td className="py-2 px-3 text-center text-blue-400">{cat.normalized}</td>
+                          <td className="py-2 px-3 text-center text-emerald-400">{cat.verified}</td>
+                          <td className="py-2 px-3 text-center text-emerald-400">{cat.published}</td>
+                          <td className="py-2 px-3 text-center text-amber-400">{cat.publicSearchEligible}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
+
                 {/* Diagnostic Records Table */}
                 {verificationDiagnosticsService.getAllDiagnostics().length > 0 && (
                   <div className="overflow-x-auto rounded-xl border border-slate-800 bg-slate-950/80">

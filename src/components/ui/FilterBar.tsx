@@ -31,13 +31,11 @@ export const FilterBar: React.FC<FilterBarProps> = ({
     { label: "All Opportunities", value: "all" },
     { label: "⚡ Hackathons", value: "hackathon" },
     { label: "🎓 Scholarships", value: "scholarship" },
-    { label: "💼 Internships", value: "private_internship" },
-    { label: "🏛️ Govt Internships", value: "government_internship" },
-    { label: "📜 Govt Exams", value: "government_exam" },
+    { label: "💼 Internships", value: "internship" },
     { label: "🌱 Fellowships", value: "fellowship" },
     { label: "🏆 Competitions", value: "competition" },
-    { label: "🔬 Research", value: "research_internship" },
-    { label: "🚀 Jobs", value: "job" },
+    { label: "🔬 Research", value: "research" },
+    { label: "📜 Govt Exams", value: "government_exam" },
   ];
 
   return (

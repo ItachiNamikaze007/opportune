@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "test": "tsx --test tests/pipeline_diagnostics.test.ts tests/crawler_integration.test.ts tests/multi_source_discovery.test.ts tests/semantic_search.test.ts tests/linkedin_discovery.test.ts tests/production_validation.test.ts tests/ingestion.test.ts tests/freshness.test.ts",
+    "test": "tsx --test tests/category_isolation.test.ts tests/pipeline_diagnostics.test.ts tests/crawler_integration.test.ts tests/multi_source_discovery.test.ts tests/semantic_search.test.ts tests/linkedin_discovery.test.ts tests/production_validation.test.ts tests/ingestion.test.ts tests/freshness.test.ts",
     "test:e2e": "tsx tests/e2e_browser_qa.mjs"
   },
   "dependencies": {

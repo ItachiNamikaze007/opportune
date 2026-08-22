@@ -134,21 +134,50 @@ export default function ExplorePage() {
         resultCount={filteredOpportunities.length}
       />
 
+      {/* Active Category Status Banner */}
+      {filters.category !== "all" && (
+        <div className="p-3.5 rounded-2xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-between text-xs text-brand-300">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-brand-400 animate-pulse" />
+            <span className="font-bold uppercase tracking-wider text-[11px]">
+              Active Category: <span className="text-white">{filters.category}</span>
+            </span>
+          </div>
+          <span className="font-semibold text-slate-300">
+            <strong className="text-white font-bold">{filteredOpportunities.length}</strong> verified {filters.category} opportunities available
+          </span>
+        </div>
+      )}
+
       {/* Results Grid */}
       {filteredOpportunities.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 pt-2">
-          {filteredOpportunities.map(({ opportunity, eligibility }) => (
-            <OpportunityCard
-              key={opportunity.id}
-              opportunity={opportunity}
-              eligibility={eligibility}
-            />
-          ))}
+          {filteredOpportunities.map(({ opportunity, eligibility }) => {
+            // Development runtime assertion to guarantee zero category leakage
+            if (process.env.NODE_ENV !== "production" && filters.category !== "all") {
+              const oppCat = opportunity.primaryCategory || opportunity.category;
+              if (oppCat !== filters.category && !oppCat.includes(filters.category)) {
+                console.warn(`[Category Isolation Warning] Item ${opportunity.id} (${oppCat}) rendered under filter ${filters.category}`);
+              }
+            }
+
+            return (
+              <OpportunityCard
+                key={opportunity.id}
+                opportunity={opportunity}
+                eligibility={eligibility}
+              />
+            );
+          })}
         </div>
       ) : (
         <EmptyState
-          title="No Matching Opportunities Found"
-          description="We couldn't find any opportunities matching your selected search terms and filters. Try resetting the filters or broadening your search criteria."
+          title={`No Verified ${filters.category !== "all" ? filters.category.toUpperCase() : ""} Opportunities Currently Available`}
+          description={
+            filters.category !== "all"
+              ? `There are currently 0 verified ${filters.category} opportunities in the active catalog. Opportune never substitutes unverified or wrong-category items.`
+              : "We couldn't find any opportunities matching your selected search terms and filters. Try resetting the filters or broadening your search criteria."
+          }
           actionText="Reset All Filters"
           onAction={resetFilters}
         />

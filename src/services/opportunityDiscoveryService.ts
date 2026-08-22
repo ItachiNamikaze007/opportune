@@ -21,6 +21,8 @@ import { UnstopAdapter } from "./adapters/unstopAdapter";
 import { DevfolioAdapter } from "./adapters/devfolioAdapter";
 import { HackerEarthAdapter } from "./adapters/hackerEarthAdapter";
 import { Buddy4StudyAdapter } from "./adapters/buddy4studyAdapter";
+import { webcmdDiscoveryService, WebcmdCandidateResult } from "./crawler/webcmdDiscoveryService";
+import { CanonicalCategory, toCanonicalCategory } from "@/types";
 
 export interface DiscoveredCandidate {
   id?: string;
@@ -85,6 +87,46 @@ export class OpportunityDiscoveryService {
    * Production Web Crawler Discovery Pipeline:
    * Real Crawl -> Deduplicate -> Pending Candidate -> Verify Official Organizer -> Revalidate -> Publish
    */
+  /**
+   * Executes Webcmd category-aware targeted discovery.
+   * All Webcmd discovered candidates start as pending verification and require official domain verification.
+   */
+  async runWebcmdTargetedDiscovery(
+    category?: CanonicalCategory | "all",
+    query?: string
+  ): Promise<{ candidatesDiscovered: number; publishedCount: number }> {
+    const webcmdResults = await webcmdDiscoveryService.discoverByCategory({ category, query });
+    let publishedCount = 0;
+
+    for (const raw of webcmdResults) {
+      const candidate: DiscoveredCandidate = {
+        sourceId: `webcmd-${raw.sourceName.toLowerCase().replace(/\s+/g, "-")}`,
+        sourceName: raw.sourceName,
+        sourceType: raw.sourceType,
+        title: raw.title,
+        organization: raw.organization,
+        officialUrl: raw.sourceUrl,
+        category: raw.category,
+        categoryLabel: raw.category.toUpperCase(),
+        lifecycleStatus: "pending_review",
+        verificationStatus: "pending",
+        confidenceScore: 40,
+        discoveryTimestamp: new Date().toISOString(),
+        discoverySourceUrl: raw.sourceUrl,
+      };
+
+      const verifyRes = await this.verifyAndPromoteCandidate(candidate, raw);
+      if (verifyRes.verified && verifyRes.publishedOpportunity) {
+        publishedCount++;
+      }
+    }
+
+    return {
+      candidatesDiscovered: webcmdResults.length,
+      publishedCount,
+    };
+  }
+
   async runRealWebCrawlerDiscovery(): Promise<{
     candidates: DiscoveredCandidate[];
     telemetry: CrawlerTelemetryMetrics[];

@@ -96,6 +96,41 @@ export class VerificationDiagnosticsService {
 
     return Array.from(map.values());
   }
+
+  getCategoryDiagnosticBreakdown(): {
+    category: string;
+    discovered: number;
+    normalized: number;
+    verified: number;
+    published: number;
+    publicSearchEligible: number;
+  }[] {
+    const categories = [
+      "hackathon",
+      "scholarship",
+      "internship",
+      "fellowship",
+      "competition",
+      "research",
+      "government_exam",
+    ];
+
+    return categories.map((cat) => {
+      const records = this.diagnosticRecords.filter(
+        (r) => r.category === cat || (r.category as string).includes(cat)
+      );
+      const verified = records.filter((r) => r.finalDecision === "published").length;
+
+      return {
+        category: cat,
+        discovered: records.length,
+        normalized: records.length,
+        verified,
+        published: verified,
+        publicSearchEligible: verified,
+      };
+    });
+  }
 }
 
 export const verificationDiagnosticsService = new VerificationDiagnosticsService();

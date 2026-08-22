@@ -10,6 +10,10 @@ export interface FilterState {
   remoteOnly: boolean;
   closingSoonOnly: boolean;
   sortBy: "best_match" | "deadline" | "newest";
+  location?: string;
+  degree?: string;
+  branch?: string;
+  year?: number;
 }
 
 interface FilterBarProps {
@@ -26,15 +30,14 @@ export const FilterBar: React.FC<FilterBarProps> = ({
   const categories: { label: string; value: OpportunityCategory | "all" }[] = [
     { label: "All Opportunities", value: "all" },
     { label: "⚡ Hackathons", value: "hackathon" },
-    { label: "🏛️ Govt Internships", value: "government_internship" },
-    { label: "💼 Private Internships", value: "private_internship" },
     { label: "🎓 Scholarships", value: "scholarship" },
+    { label: "💼 Internships", value: "private_internship" },
+    { label: "🏛️ Govt Internships", value: "government_internship" },
     { label: "📜 Govt Exams", value: "government_exam" },
+    { label: "🌱 Fellowships", value: "fellowship" },
+    { label: "🏆 Competitions", value: "competition" },
     { label: "🔬 Research", value: "research_internship" },
     { label: "🚀 Jobs", value: "job" },
-    { label: "🏆 Competitions", value: "competition" },
-    { label: "🌍 International", value: "international_opportunity" },
-    { label: "🌱 Fellowships", value: "fellowship" },
   ];
 
   return (
@@ -59,9 +62,35 @@ export const FilterBar: React.FC<FilterBarProps> = ({
         })}
       </div>
 
-      {/* Secondary Bar: Eligibility, Remote, Deadline & Sort */}
+      {/* Secondary Bar: Eligibility, Degree, Location, Remote, Deadline & Sort */}
       <div className="flex flex-wrap items-center justify-between gap-3 p-3 sm:p-4 rounded-2xl bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 text-xs">
         <div className="flex flex-wrap items-center gap-2">
+          {/* Degree Filter */}
+          <select
+            value={filters.degree || "all"}
+            onChange={(e) => onFilterChange({ degree: e.target.value })}
+            className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-200 font-medium focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer"
+          >
+            <option value="all">Degree: All</option>
+            <option value="B.Tech">B.Tech / B.E.</option>
+            <option value="M.Tech">M.Tech</option>
+            <option value="MCA">MCA</option>
+            <option value="B.Sc">B.Sc / M.Sc</option>
+          </select>
+
+          {/* Location Filter */}
+          <select
+            value={filters.location || "all"}
+            onChange={(e) => onFilterChange({ location: e.target.value })}
+            className="bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 py-1.5 text-xs text-slate-900 dark:text-slate-200 font-medium focus:outline-none focus:ring-1 focus:ring-brand-500 cursor-pointer"
+          >
+            <option value="all">Location: All India</option>
+            <option value="remote">Remote Only</option>
+            <option value="Delhi">Delhi NCR</option>
+            <option value="Karnataka">Karnataka / Bangalore</option>
+            <option value="Maharashtra">Maharashtra / Mumbai</option>
+          </select>
+
           {/* Eligibility Filter */}
           <div className="flex items-center gap-1 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700/60">
             <button
@@ -84,16 +113,6 @@ export const FilterBar: React.FC<FilterBarProps> = ({
             >
               🟢 Eligible Only
             </button>
-            <button
-              onClick={() => onFilterChange({ eligibility: "potentially_eligible" })}
-              className={`px-2.5 py-1 rounded-lg font-medium transition-all flex items-center gap-1 ${
-                filters.eligibility === "potentially_eligible"
-                  ? "bg-amber-600 text-white shadow-sm font-semibold"
-                  : "text-amber-500 hover:text-amber-400"
-              }`}
-            >
-              🟡 Potentially Eligible
-            </button>
           </div>
 
           {/* Remote Toggle */}
@@ -105,7 +124,7 @@ export const FilterBar: React.FC<FilterBarProps> = ({
                 : "bg-slate-100 dark:bg-slate-800/50 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-800 hover:border-slate-700"
             }`}
           >
-            <span>🌐 Remote Only</span>
+            <span>🌐 Remote</span>
             {filters.remoteOnly && <Check className="w-3.5 h-3.5 text-brand-400" />}
           </button>
 

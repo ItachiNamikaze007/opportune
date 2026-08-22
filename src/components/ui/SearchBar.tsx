@@ -12,7 +12,7 @@ interface SearchBarProps {
 export const SearchBar: React.FC<SearchBarProps> = ({
   value,
   onChange,
-  placeholder = "Search internships, exams, hackathons, scholarships...",
+  placeholder = "What opportunity are you looking for? (e.g. Hackathons in India, B.Tech scholarships)",
 }) => {
   return (
     <div className="relative w-full">

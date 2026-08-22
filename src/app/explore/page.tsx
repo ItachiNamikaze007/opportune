@@ -8,6 +8,7 @@ import { OpportunityCard } from "@/components/ui/OpportunityCard";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { Compass, Sparkles, SlidersHorizontal, RefreshCw } from "lucide-react";
 import { getOpportunityStatus } from "@/services/opportunityStatusResolver";
+import { semanticSearchService } from "@/services/semanticSearchService";
 
 export default function ExplorePage() {
   const { opportunitiesWithEligibility } = useStudent();
@@ -36,44 +37,23 @@ export default function ExplorePage() {
     });
   };
 
-  // Filter and sort items
+  // Filter and sort items via semanticSearchService
   const filteredOpportunities = useMemo(() => {
-    let results = opportunitiesWithEligibility.filter(({ opportunity, eligibility }) => {
-      // 1. Text Search
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesTitle = opportunity.title.toLowerCase().includes(q);
-        const matchesOrg = opportunity.organization.toLowerCase().includes(q);
-        const matchesDesc = opportunity.description.toLowerCase().includes(q);
-        const matchesTags = opportunity.tags?.some((t) => t.toLowerCase().includes(q));
-        if (!matchesTitle && !matchesOrg && !matchesDesc && !matchesTags) {
-          return false;
-        }
+    let results = semanticSearchService.filterCatalog(
+      opportunitiesWithEligibility,
+      searchQuery,
+      {
+        category: filters.category,
+        eligibilityStatus: filters.eligibility,
+        remoteOnly: filters.remoteOnly,
+        closingSoonOnly: filters.closingSoonOnly,
+        location: filters.location,
+        degree: filters.degree,
+        branch: filters.branch,
+        year: filters.year,
+        sortBy: filters.sortBy,
       }
-
-      // 2. Category Filter
-      if (filters.category !== "all" && opportunity.category !== filters.category) {
-        return false;
-      }
-
-      // 3. Eligibility Status Filter
-      if (filters.eligibility !== "all" && eligibility.status !== filters.eligibility) {
-        return false;
-      }
-
-      // 4. Remote Only
-      if (filters.remoteOnly && !opportunity.remote) {
-        return false;
-      }
-
-      // 5. Closing Soon Only (strictly using getOpportunityStatus)
-      const statusRes = getOpportunityStatus(opportunity);
-      if (filters.closingSoonOnly && statusRes.status !== "CLOSING_SOON") {
-        return false;
-      }
-
-      return true;
-    });
+    );
 
     // Sort results (Active first, then by selected sort)
     results.sort((a, b) => {

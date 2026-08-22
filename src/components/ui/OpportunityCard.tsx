@@ -133,9 +133,23 @@ export const OpportunityCard: React.FC<OpportunityCardProps> = ({
           </div>
 
           {/* Short Description */}
-          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mb-4">
+          <p className="text-xs text-slate-600 dark:text-slate-400 line-clamp-2 leading-relaxed mb-3">
             {opportunity.description}
           </p>
+
+          {/* Verification Badges */}
+          <div className="flex items-center gap-1.5 flex-wrap mb-3.5">
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <ShieldCheck className="w-3 h-3 text-emerald-400" />
+              Officially Verified
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+              ✓ Deadline Verified
+            </span>
+            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/20">
+              ✓ Eligibility Verified
+            </span>
+          </div>
 
           {/* Match Score & Status Highlights */}
           <div className="p-3 rounded-2xl bg-slate-100 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 mb-4 flex flex-col gap-2">

@@ -42,6 +42,7 @@ import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
 import { opportunitySyncService, SyncReport } from "@/services/opportunitySyncService";
 import { linkedinDiscoveryService } from "@/services/linkedinDiscoveryService";
+import { opportunityDiscoveryService } from "@/services/opportunityDiscoveryService";
 import { DiscoveryCandidate } from "@/types";
 
 export default function AdminReviewPage() {
@@ -58,7 +59,9 @@ export default function AdminReviewPage() {
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [analytics, setAnalytics] = useState<SystemAnalyticsSummary | null>(null);
   const [discoveryCandidates, setDiscoveryCandidates] = useState<DiscoveryCandidate[]>([]);
+  const [multiSourceMetrics, setMultiSourceMetrics] = useState<any[]>([]);
   const [isVerifyingCandidate, setIsVerifyingCandidate] = useState<string | null>(null);
+  const [isDiscoveringMultiSource, setIsDiscoveringMultiSource] = useState(false);
 
   const { showToast } = useToast();
 
@@ -72,11 +75,33 @@ export default function AdminReviewPage() {
     setAuditLogs(auditLogService.getRecentLogs(25));
     const metrics = await analyticsService.getSystemMetricsSummary();
     setAnalytics(metrics);
-    setDiscoveryCandidates(linkedinDiscoveryService.getAllCandidates());
+    setDiscoveryCandidates([
+      ...linkedinDiscoveryService.getAllCandidates(),
+      ...opportunityDiscoveryService.getAllMultiSourceCandidates() as any[],
+    ]);
+  };
+
+  const handleRunMultiSourceDiscovery = async () => {
+    setIsDiscoveringMultiSource(true);
+    try {
+      const res = await opportunityDiscoveryService.runMultiSourceDiscovery();
+      setMultiSourceMetrics(res.metrics);
+      showToast(
+        "Multi-Source Discovery Completed 🎉",
+        `Scraped ${res.candidates.length} candidates, published ${res.publishedCount} new verified opportunities to Opportune website.`,
+        "success"
+      );
+      loadData();
+    } catch (err: any) {
+      showToast("Discovery Error", err.message || "Failed to run multi-source discovery", "error");
+    } finally {
+      setIsDiscoveringMultiSource(false);
+    }
   };
 
   useEffect(() => {
     loadData();
+    handleRunMultiSourceDiscovery();
   }, []);
 
   const handleVerifyDiscoveryCandidate = async (candidateId: string) => {
@@ -643,7 +668,7 @@ export default function AdminReviewPage() {
           </div>
         )}
 
-        {/* TAB: DISCOVERY SIGNALS (LINKEDIN DISCOVERY-ONLY) */}
+        {/* TAB: DISCOVERY SIGNALS (LINKEDIN & PUBLIC MULTI-SOURCE DISCOVERY) */}
         {activeTab === "discovery" && (
           <div className="space-y-6">
             <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
@@ -651,20 +676,27 @@ export default function AdminReviewPage() {
                 <div>
                   <div className="flex items-center gap-2 mb-1">
                     <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
-                      Discovery-Only Source
+                      Multi-Source Discovery Engine
                     </span>
-                    <span className="text-xs text-slate-500">LinkedIn & Public Signals</span>
+                    <span className="text-xs text-slate-500">Unstop • Devfolio • HackerEarth • Buddy4Study • LinkedIn • Mock Test</span>
                   </div>
                   <h3 className="text-lg font-bold text-white flex items-center gap-2">
                     <Sparkles className="w-5 h-5 text-amber-400" />
-                    Discovery Signals & Official Source Verification
+                    Multi-Source Discovery Dashboard & Verification Pipeline
                   </h3>
                   <p className="text-xs text-slate-400 mt-1 max-w-3xl">
-                    Early signals discovered from public posts and feeds. Under the architecture: 
-                    <strong className="text-slate-300"> DISCOVER → VERIFY → REVALIDATE → PUBLISH</strong>. 
-                    Direct publishing from LinkedIn is strictly disabled; official accredited organization domains remain the canonical source of truth.
+                    Pipeline: <strong className="text-slate-300">SOURCE → DISCOVER → DEDUPLICATE → PENDING → VERIFY OFFICIAL SOURCE → REVALIDATE → PUBLISH</strong>.
+                    Aggregators and social feeds are treated strictly as discovery signals. Candidates flow into the Opportune catalog only after official domain verification.
                   </p>
                 </div>
+                <button
+                  onClick={handleRunMultiSourceDiscovery}
+                  disabled={isDiscoveringMultiSource}
+                  className="px-4 py-2 rounded-xl text-xs font-bold bg-amber-600 hover:bg-amber-500 text-white transition-all shadow-md flex items-center gap-2 shrink-0 disabled:opacity-50"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isDiscoveringMultiSource ? "animate-spin" : ""}`} />
+                  {isDiscoveringMultiSource ? "Discovering Sources..." : "Run Multi-Source Discovery"}
+                </button>
               </div>
 
               {/* Discovery Summary Stats */}
@@ -692,6 +724,51 @@ export default function AdminReviewPage() {
                   </div>
                 </div>
               </div>
+
+              {/* MULTI-SOURCE METRICS MATRIX TABLE */}
+              {multiSourceMetrics.length > 0 && (
+                <div className="pt-3 border-t border-slate-800">
+                  <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider mb-2.5">
+                    Configured Source Discovery Metrics
+                  </h4>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-xs text-left border-collapse">
+                      <thead>
+                        <tr className="border-b border-slate-800 text-slate-400 font-semibold">
+                          <th className="py-2 px-3">Source Name</th>
+                          <th className="py-2 px-3">Type</th>
+                          <th className="py-2 px-3 text-center">Discovered</th>
+                          <th className="py-2 px-3 text-center">New</th>
+                          <th className="py-2 px-3 text-center">Pending</th>
+                          <th className="py-2 px-3 text-center">Verified</th>
+                          <th className="py-2 px-3 text-center">Rejected</th>
+                          <th className="py-2 px-3 text-center">Conflicts</th>
+                          <th className="py-2 px-3 text-center">Failures</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/60 font-mono text-[11px]">
+                        {multiSourceMetrics.map((m) => (
+                          <tr key={m.sourceId} className="hover:bg-slate-900/40">
+                            <td className="py-2 px-3 font-sans font-semibold text-white">{m.sourceName}</td>
+                            <td className="py-2 px-3 font-sans">
+                              <span className="px-2 py-0.5 rounded text-[9px] uppercase font-bold bg-slate-800 text-slate-300">
+                                {m.sourceType}
+                              </span>
+                            </td>
+                            <td className="py-2 px-3 text-center text-amber-400">{m.discovered}</td>
+                            <td className="py-2 px-3 text-center text-blue-400">{m.newCandidates}</td>
+                            <td className="py-2 px-3 text-center text-slate-300">{m.pending}</td>
+                            <td className="py-2 px-3 text-center text-emerald-400">{m.verified}</td>
+                            <td className="py-2 px-3 text-center text-red-400">{m.rejected}</td>
+                            <td className="py-2 px-3 text-center text-purple-400">{m.conflicts}</td>
+                            <td className="py-2 px-3 text-center text-rose-400">{m.failures}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Candidates List */}

@@ -41,9 +41,11 @@ import { catalogAuditService, CatalogAuditReport } from "@/services/catalogAudit
 import { realVerifiedOpportunities } from "@/data/realOpportunities";
 import { mockOpportunities } from "@/data/mockOpportunities";
 import { opportunitySyncService, SyncReport } from "@/services/opportunitySyncService";
+import { linkedinDiscoveryService } from "@/services/linkedinDiscoveryService";
+import { DiscoveryCandidate } from "@/types";
 
 export default function AdminReviewPage() {
-  const [activeTab, setActiveTab] = useState<"queue" | "sources" | "audit" | "freshness" | "sync">("queue");
+  const [activeTab, setActiveTab] = useState<"queue" | "discovery" | "sources" | "audit" | "freshness" | "sync">("queue");
   const [reviews, setReviews] = useState<ReviewQueueItem[]>([]);
   const [selectedReviewId, setSelectedReviewId] = useState<string | null>(null);
   const [reviewNotes, setReviewNotes] = useState<string>("");
@@ -55,6 +57,8 @@ export default function AdminReviewPage() {
   const [sourceMetrics, setSourceMetrics] = useState<SourceHealthMetrics[]>([]);
   const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
   const [analytics, setAnalytics] = useState<SystemAnalyticsSummary | null>(null);
+  const [discoveryCandidates, setDiscoveryCandidates] = useState<DiscoveryCandidate[]>([]);
+  const [isVerifyingCandidate, setIsVerifyingCandidate] = useState<string | null>(null);
 
   const { showToast } = useToast();
 
@@ -68,11 +72,53 @@ export default function AdminReviewPage() {
     setAuditLogs(auditLogService.getRecentLogs(25));
     const metrics = await analyticsService.getSystemMetricsSummary();
     setAnalytics(metrics);
+    setDiscoveryCandidates(linkedinDiscoveryService.getAllCandidates());
   };
 
   useEffect(() => {
     loadData();
   }, []);
+
+  const handleVerifyDiscoveryCandidate = async (candidateId: string) => {
+    setIsVerifyingCandidate(candidateId);
+    try {
+      const res = await linkedinDiscoveryService.verifyOfficialSourceForCandidate(candidateId);
+      if (res.verified && res.verifiedOpportunity) {
+        await auditLogService.logAction(
+          "Admin Staff",
+          "opportunity_approved",
+          candidateId,
+          `Verified LinkedIn discovery signal against official source: ${res.verifiedOpportunity.officialUrl}. ${res.conflictDetected ? "Resolved conflict: Official deadline prioritized." : ""}`
+        );
+        showToast(
+          "Official Source Verified 🎉",
+          res.conflictDetected
+            ? `Discrepancy resolved: Official source deadline prioritized over LinkedIn signal.`
+            : `Verified against official portal ${res.candidate.officialUrl}.`,
+          "success"
+        );
+      } else {
+        showToast("Official Verification Incomplete", res.reason, "info");
+      }
+      loadData();
+    } catch (err: any) {
+      showToast("Verification Error", err.message || "Failed to verify official source", "error");
+    } finally {
+      setIsVerifyingCandidate(null);
+    }
+  };
+
+  const handleRejectDiscoveryCandidate = async (candidateId: string) => {
+    linkedinDiscoveryService.rejectCandidate(candidateId, "Rejected by administrator review.");
+    await auditLogService.logAction(
+      "Admin Staff",
+      "opportunity_rejected",
+      candidateId,
+      "Rejected unverified LinkedIn discovery signal."
+    );
+    showToast("Discovery Candidate Rejected", "Marked as rejected.", "info");
+    loadData();
+  };
 
   const selectedItem = reviews.find((r) => r.id === selectedReviewId);
 
@@ -259,10 +305,10 @@ export default function AdminReviewPage() {
         )}
 
         {/* Navigation Tabs */}
-        <div className="flex border-b border-slate-800 space-x-6 text-sm font-semibold">
+        <div className="flex border-b border-slate-800 space-x-6 text-sm font-semibold overflow-x-auto">
           <button
             onClick={() => setActiveTab("queue")}
-            className={`pb-3 border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === "queue"
                 ? "border-brand-500 text-brand-400"
                 : "border-transparent text-slate-400 hover:text-slate-200"
@@ -271,8 +317,18 @@ export default function AdminReviewPage() {
             <ShieldCheck className="w-4 h-4" /> Review Queue ({reviews.length})
           </button>
           <button
+            onClick={() => setActiveTab("discovery")}
+            className={`pb-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
+              activeTab === "discovery"
+                ? "border-amber-500 text-amber-400"
+                : "border-transparent text-slate-400 hover:text-slate-200"
+            }`}
+          >
+            <Sparkles className="w-4 h-4" /> Discovery Signals ({discoveryCandidates.length})
+          </button>
+          <button
             onClick={() => setActiveTab("sync")}
-            className={`pb-3 border-b-2 transition-all flex items-center gap-2 ${
+            className={`pb-3 border-b-2 transition-all flex items-center gap-2 whitespace-nowrap ${
               activeTab === "sync"
                 ? "border-brand-500 text-brand-400"
                 : "border-transparent text-slate-400 hover:text-slate-200"
@@ -583,6 +639,219 @@ export default function AdminReviewPage() {
                   </div>
                 )}
               </div>
+            </div>
+          </div>
+        )}
+
+        {/* TAB: DISCOVERY SIGNALS (LINKEDIN DISCOVERY-ONLY) */}
+        {activeTab === "discovery" && (
+          <div className="space-y-6">
+            <div className="p-6 rounded-2xl bg-slate-900/60 border border-slate-800 space-y-4">
+              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20">
+                      Discovery-Only Source
+                    </span>
+                    <span className="text-xs text-slate-500">LinkedIn & Public Signals</span>
+                  </div>
+                  <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                    <Sparkles className="w-5 h-5 text-amber-400" />
+                    Discovery Signals & Official Source Verification
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-1 max-w-3xl">
+                    Early signals discovered from public posts and feeds. Under the architecture: 
+                    <strong className="text-slate-300"> DISCOVER → VERIFY → REVALIDATE → PUBLISH</strong>. 
+                    Direct publishing from LinkedIn is strictly disabled; official accredited organization domains remain the canonical source of truth.
+                  </p>
+                </div>
+              </div>
+
+              {/* Discovery Summary Stats */}
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Total Discovery Signals</div>
+                  <div className="text-xl font-bold text-amber-400">{discoveryCandidates.length}</div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Pending Verification</div>
+                  <div className="text-xl font-bold text-slate-300">
+                    {discoveryCandidates.filter((c) => c.verificationStatus === "pending").length}
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Verified with Official Source</div>
+                  <div className="text-xl font-bold text-emerald-400">
+                    {discoveryCandidates.filter((c) => c.verificationStatus === "verified").length}
+                  </div>
+                </div>
+                <div className="p-3 rounded-xl bg-slate-950/70 border border-slate-800">
+                  <div className="text-[11px] text-slate-400">Conflicts Resolved</div>
+                  <div className="text-xl font-bold text-purple-400">
+                    {discoveryCandidates.filter((c) => c.sourceConflict).length}
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Candidates List */}
+            <div className="space-y-4">
+              {discoveryCandidates.length === 0 ? (
+                <div className="p-12 text-center rounded-2xl bg-slate-900/40 border border-slate-800 text-slate-500">
+                  No active discovery signals.
+                </div>
+              ) : (
+                discoveryCandidates.map((candidate) => {
+                  const isPending = candidate.verificationStatus === "pending";
+                  const isVerified = candidate.verificationStatus === "verified";
+                  const isRejected = candidate.verificationStatus === "rejected";
+
+                  return (
+                    <div
+                      key={candidate.id}
+                      className="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-slate-700/80 transition-all space-y-4"
+                    >
+                      <div className="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                        <div className="space-y-1.5 flex-1">
+                          <div className="flex flex-wrap items-center gap-2">
+                            <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                              {candidate.discoveredFrom} (Discovery-Only)
+                            </span>
+                            <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-slate-800 text-slate-300">
+                              {candidate.categoryLabel || "Opportunity"}
+                            </span>
+                            {isPending && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-500/10 text-amber-400 border border-amber-500/20 flex items-center gap-1">
+                                <Clock className="w-3 h-3" /> Pending Official Verification
+                              </span>
+                            )}
+                            {isVerified && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
+                                <CheckCircle className="w-3 h-3" /> Official Source Verified
+                              </span>
+                            )}
+                            {isRejected && (
+                              <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-red-500/10 text-red-400 border border-red-500/20 flex items-center gap-1">
+                                <XCircle className="w-3 h-3" /> Rejected
+                              </span>
+                            )}
+                          </div>
+
+                          <h4 className="text-base font-bold text-white pt-1">{candidate.title}</h4>
+                          <div className="text-xs text-slate-400 font-medium flex items-center gap-2">
+                            <Building2 className="w-3.5 h-3.5 text-slate-500" /> {candidate.organization}
+                            <span className="text-slate-600">•</span>
+                            <Clock className="w-3.5 h-3.5 text-slate-500" /> Discovered: {new Date(candidate.discoveredAt).toLocaleString()}
+                          </div>
+                        </div>
+
+                        {/* Action Buttons: Verify Official Source or Reject (NO publish from LinkedIn) */}
+                        <div className="flex items-center gap-2 shrink-0">
+                          {isPending && (
+                            <>
+                              <button
+                                onClick={() => handleVerifyDiscoveryCandidate(candidate.id)}
+                                disabled={isVerifyingCandidate === candidate.id}
+                                className="px-3.5 py-2 rounded-xl text-xs font-semibold bg-emerald-600 hover:bg-emerald-500 text-white transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                              >
+                                <CheckCircle className={`w-3.5 h-3.5 ${isVerifyingCandidate === candidate.id ? "animate-spin" : ""}`} />
+                                {isVerifyingCandidate === candidate.id ? "Verifying..." : "Verify Official Source"}
+                              </button>
+                              <button
+                                onClick={() => handleRejectDiscoveryCandidate(candidate.id)}
+                                className="px-3 py-2 rounded-xl text-xs font-semibold bg-slate-800 hover:bg-red-500/20 text-slate-400 hover:text-red-300 transition-all border border-slate-700/60 flex items-center gap-1"
+                              >
+                                <XCircle className="w-3.5 h-3.5" />
+                                Reject
+                              </button>
+                            </>
+                          )}
+                          {isVerified && (
+                            <span className="px-3 py-1.5 rounded-xl text-xs font-medium bg-emerald-950/40 text-emerald-300 border border-emerald-800/40 flex items-center gap-1">
+                              <Check className="w-3.5 h-3.5" /> Canonical Source Linked
+                            </span>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Announcement text & Provenance Info */}
+                      <p className="text-xs text-slate-300 bg-slate-950/40 p-3 rounded-xl border border-slate-800/60 leading-relaxed">
+                        {candidate.description}
+                      </p>
+
+                      {/* Conflict and Verification Status Grid */}
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">
+                        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
+                          <div className="font-semibold text-slate-400 flex items-center gap-1.5">
+                            <Layers className="w-3.5 h-3.5 text-blue-400" /> Discovery Evidence
+                          </div>
+                          <div className="space-y-1 text-slate-300 text-[11px]">
+                            <div>
+                              <span className="text-slate-500">Exact Signal URL:</span>{" "}
+                              <a
+                                href={candidate.sourceUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-400 hover:underline inline-flex items-center gap-0.5 break-all"
+                              >
+                                {candidate.sourceUrl} <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
+                              </a>
+                            </div>
+                            {candidate.candidateDeadline && (
+                              <div>
+                                <span className="text-slate-500">Claimed Deadline in Post:</span>{" "}
+                                <span className="font-mono text-amber-300">{candidate.candidateDeadline}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="p-3 rounded-xl bg-slate-950/60 border border-slate-800 space-y-1.5">
+                          <div className="font-semibold text-slate-400 flex items-center gap-1.5">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" /> Canonical Verification
+                          </div>
+                          <div className="space-y-1 text-slate-300 text-[11px]">
+                            <div>
+                              <span className="text-slate-500">Official Domain:</span>{" "}
+                              {candidate.officialUrl ? (
+                                <a
+                                  href={candidate.officialUrl}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="text-emerald-400 hover:underline inline-flex items-center gap-0.5 break-all"
+                                >
+                                  {candidate.officialUrl} <ExternalLink className="w-2.5 h-2.5 inline shrink-0" />
+                                </a>
+                              ) : (
+                                <span className="text-slate-500 italic">Not yet verified</span>
+                              )}
+                            </div>
+                            {candidate.officialDeadline && (
+                              <div>
+                                <span className="text-slate-500">Canonical Official Deadline:</span>{" "}
+                                <span className="font-mono text-emerald-300 font-semibold">{candidate.officialDeadline}</span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Conflict Notification Alert */}
+                      {candidate.sourceConflict && (
+                        <div className="p-3 rounded-xl bg-purple-950/30 border border-purple-800/40 text-xs text-purple-200 flex items-start gap-2">
+                          <AlertTriangle className="w-4 h-4 text-purple-400 shrink-0 mt-0.5" />
+                          <div>
+                            <div className="font-semibold text-purple-300">Discrepancy Resolved: Official Source Overrides LinkedIn</div>
+                            <div className="text-[11px] text-purple-300/80 mt-0.5">
+                              {candidate.conflictDetails || "Official organization website deadline takes absolute priority over early LinkedIn announcement claim."}
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+                  );
+                })
+              )}
             </div>
           </div>
         )}

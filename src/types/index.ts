@@ -100,7 +100,31 @@ export type ReviewStatus =
   | "rejected"
   | "needs_more_information";
 
-export type SourceProvenanceType = "official" | "partner" | "aggregator";
+export type SourceProvenanceType = "official" | "partner" | "aggregator" | "discovery_only";
+export type SourceType = SourceProvenanceType;
+
+export interface DiscoveryCandidate {
+  id: string;
+  title: string;
+  organization?: string;
+  description?: string;
+  discoveredFrom: string; // e.g. "LinkedIn"
+  sourceUrl: string; // verbatim discovered LinkedIn URL
+  sourceType: "discovery_only";
+  discoveredAt: string;
+  verificationStatus: "pending" | "verified" | "rejected";
+  officialUrl?: string;
+  candidateDeadline?: string;
+  officialDeadline?: string;
+  category?: OpportunityCategory;
+  categoryLabel?: string;
+  confidenceScore?: number;
+  sourceConflict?: boolean;
+  conflictDetails?: string;
+  officialApplyUrl?: string;
+  officialRulesPdfUrl?: string;
+  notes?: string;
+}
 
 export type ConfidenceLevel =
   | "needs_review"

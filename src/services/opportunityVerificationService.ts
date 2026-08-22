@@ -46,6 +46,7 @@ const THIRD_PARTY_DISALLOWLIST = [
   "google.com/search",
   "bing.com",
   "reddit.com",
+  "linkedin.com",
   "linkedin.com/posts",
   "medium.com",
   "blogger.com",
@@ -60,7 +61,7 @@ const THIRD_PARTY_DISALLOWLIST = [
 export interface SourceComparisonResult {
   hasConflict: boolean;
   resolvedDeadline: string;
-  sourceType: "official" | "partner" | "aggregator";
+  sourceType: "official" | "partner" | "aggregator" | "discovery_only";
   officialDeadline?: string;
   partnerDeadline?: string;
   resolutionNote: string;
@@ -82,7 +83,7 @@ export interface LiveVerificationResult {
   lastVerifiedAt: string;
   reason?: string;
   domainValid: boolean;
-  sourceType?: "official" | "partner" | "aggregator";
+  sourceType?: "official" | "partner" | "aggregator" | "discovery_only";
 }
 
 export interface VerificationResult {
@@ -92,7 +93,7 @@ export interface VerificationResult {
   applyUrl?: string;
   rulesPdfUrl?: string;
   sourceName?: string;
-  sourceType?: "official" | "partner" | "aggregator";
+  sourceType?: "official" | "partner" | "aggregator" | "discovery_only";
   deadline?: string;
   isExpired?: boolean;
   verifiedAt?: string;

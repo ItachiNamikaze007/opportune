@@ -15,7 +15,7 @@ export interface RawOpportunityRecord {
   rawId?: string;
   sourceId: string;
   sourceName?: string;
-  sourceType?: "official" | "partner" | "aggregator";
+  sourceType?: "official" | "partner" | "aggregator" | "discovery_only";
   sourceUrl: string;
   officialUrl?: string;
   applyUrl?: string;
@@ -52,7 +52,7 @@ export interface NormalizedOpportunity {
   id?: string;
   sourceId: string;
   sourceName?: string;
-  sourceType?: "official" | "partner" | "aggregator";
+  sourceType?: "official" | "partner" | "aggregator" | "discovery_only";
   title: string;
   organization: string;
   category: OpportunityCategory;
